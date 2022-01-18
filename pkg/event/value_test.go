@@ -2,6 +2,7 @@ package event
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"testing"
 
@@ -19,82 +20,82 @@ func TestValueTypeString(t *testing.T) {
 
 func TestValueString(t *testing.T) {
 	var testCases = []struct {
-		Value  Value
+		Value  *Value
 		String string
 	}{
 		{
-			Value{
+			&Value{
 				Type: NullType,
 			},
 			"null_type:<nil>",
 		},
 		{
-			Value{
+			&Value{
 				Type:    IntegerType,
 				Integer: 1,
 			},
 			"integer_type:1",
 		},
 		{
-			Value{
+			&Value{
 				Type:            UnsignedIntegerType,
 				UnsignedInteger: 1,
 			},
 			"unsigned_integer_type:1",
 		},
 		{
-			Value{
+			&Value{
 				Type:  FloatType,
 				Float: 1.0,
 			},
 			"float_type:1",
 		},
 		{
-			Value{
-				Type:  BytesType,
-				Bytes: "foo",
+			&Value{
+				Type:   StringType,
+				String: "foo",
 			},
-			"bytes_type:foo",
+			"string_type:foo",
 		},
 		{
-			Value{
+			&Value{
 				Type: BoolType,
 				Bool: true,
 			},
 			"bool_type:true",
 		},
 		{
-			Value{
+			&Value{
 				Type:      TimestampType,
 				Timestamp: Time{testTimeUnix},
 			},
 			"timestamp_type:" + strconv.FormatInt(testTimeUnix, 10),
 		},
 		{
-			Value{
+			&Value{
 				Type:  ArrayType,
 				Array: Array(NullValue).Array,
 			},
 			"array_type:[null_type:<nil>]",
 		},
 		{
-			Value{
+			&Value{
 				Type: ObjectType,
 				Object: map[string]*Value{
 					"foo": String("bar"),
 				},
 			},
-			"object_type:{foo:bytes_type:bar}",
+			"object_type:map[foo:string_type:bar]",
 		},
 	}
 
 	for _, tc := range testCases {
-		assert.Equal(t, tc.String, tc.Value.String())
+		assert.Equal(t, tc.String, fmt.Sprintf("%v", tc.Value))
 	}
 }
 
 func TestValueJSONMarshal(t *testing.T) {
-	v := Value{
+	v := &Value{
 		Type: ObjectType,
 		Object: map[string]*Value{
 			"hello": String("world"),
@@ -103,7 +104,6 @@ func TestValueJSONMarshal(t *testing.T) {
 
 	data, err := json.Marshal(v)
 	require.NoError(t, err)
-	t.Log(string(data))
 
 	assert.Equal(t, `{"hello":"world"}`, string(data))
 }

@@ -13,10 +13,10 @@ const (
 	NullType ValueType = iota
 	ArrayType
 	BoolType
-	BytesType
 	FloatType
 	IntegerType
 	ObjectType
+	StringType
 	TimestampType
 	UnsignedIntegerType
 	maxValueType
@@ -26,10 +26,10 @@ var valueTypeNames = map[ValueType]string{
 	NullType:            "null_type",
 	ArrayType:           "array_type",
 	BoolType:            "bool_type",
-	BytesType:           "bytes_type",
 	FloatType:           "float_type",
 	IntegerType:         "integer_type",
 	ObjectType:          "object_type",
+	StringType:          "string_type",
 	TimestampType:       "timestamp_type",
 	UnsignedIntegerType: "unsigned_integer_type",
 }
@@ -46,7 +46,7 @@ type Value struct {
 	UnsignedInteger uint64
 	Float           float64
 	Timestamp       Time
-	Bytes           string
+	String          string
 	Array           []*Value
 	Object          map[string]*Value
 	Bool            bool
@@ -59,14 +59,14 @@ func (v *Value) value() interface{} {
 		return v.Array
 	case BoolType:
 		return v.Bool
-	case BytesType:
-		return v.Bytes
 	case FloatType:
 		return v.Float
 	case IntegerType:
 		return v.Integer
 	case ObjectType:
 		return v.Object
+	case StringType:
+		return v.String
 	case TimestampType:
 		return v.Timestamp
 	case UnsignedIntegerType:
@@ -78,12 +78,16 @@ func (v *Value) value() interface{} {
 	}
 }
 
-func (v Value) String() string {
-	return fmt.Sprintf("%s:%v", v.Type.String(), v.value())
+func (v *Value) Format(f fmt.State, verb rune) {
+	// Not implementing String() because it collides with the String field.
+	f.Write([]byte(v.Type.String()))
+	f.Write([]byte(":"))
+	fmt.Fprintf(f, "%v", v.value())
 }
 
-func (v Value) MarshalJSON() ([]byte, error) {
-	// TODO: Replace this with an optimized version.
+func (v *Value) MarshalJSON() ([]byte, error) {
+	// TODO: Replace this with an optimized version. There are a finite
+	// set of types so we can optimize this to avoid reflection.
 	return json.Marshal(v.value())
 }
 
@@ -104,7 +108,7 @@ func Float(v float64) *Value {
 }
 
 func String(v string) *Value {
-	return &Value{Type: BytesType, Bytes: v}
+	return &Value{Type: StringType, String: v}
 }
 
 func Timestamp(v Time) *Value {

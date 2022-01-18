@@ -14,11 +14,11 @@ func (p *Lowercase) Process(evt processor.Event) error {
 		return processor.ErrorKeyMissing{Key: p.config.Field}
 	}
 
-	if v.Type != event.BytesType {
+	if v.Type != event.StringType {
 		return errors.New("value to lowercase is not a string")
 	}
 
-	out := strings.ToLower(v.Bytes)
+	out := strings.ToLower(v.String)
 
 	targetField := p.config.Field
 	if p.config.TargetField != "" {

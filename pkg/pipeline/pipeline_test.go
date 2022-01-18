@@ -147,7 +147,7 @@ func TestPipeline(t *testing.T) {
 		out := evts[0]
 		eventId := out.Get("event.id")
 		require.NotNil(t, eventId)
-		assert.Equal(t, "1234", eventId.Bytes)
+		assert.Equal(t, "1234", eventId.String)
 	})
 
 	t.Run("processor err", func(t *testing.T) {
@@ -212,7 +212,7 @@ func TestPipeline(t *testing.T) {
 		out := evts[0]
 		kind := out.Get("event.kind")
 		require.NotNil(t, kind)
-		assert.Equal(t, "pipeline_error", kind.Bytes)
+		assert.Equal(t, "pipeline_error", kind.String)
 	})
 
 	t.Run("pipeline err with global on_failure", func(t *testing.T) {
@@ -251,7 +251,7 @@ func TestPipeline(t *testing.T) {
 		out := evts[0]
 		kind := out.Get("event.kind")
 		require.NotNil(t, kind)
-		assert.Equal(t, "pipeline_error", kind.Bytes)
+		assert.Equal(t, "pipeline_error", kind.String)
 	})
 
 	t.Run("pipeline err no global on_failure", func(t *testing.T) {
