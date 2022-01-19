@@ -1,6 +1,7 @@
 package event
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 )
@@ -89,6 +90,53 @@ func (v *Value) MarshalJSON() ([]byte, error) {
 	// TODO: Replace this with an optimized version. There are a finite
 	// set of types so we can optimize this to avoid reflection.
 	return json.Marshal(v.value())
+}
+
+func (v *Value) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
+	tok, err := dec.Token()
+	if err != nil {
+		return err
+	}
+
+	switch tok {
+	case json.Delim('['):
+		if err = json.Unmarshal(data, &v.Array); err != nil {
+			return err
+		}
+		v.Type = ArrayType
+	case json.Delim('{'):
+		if err = json.Unmarshal(data, &v.Object); err != nil {
+			return err
+		}
+		v.Type = ObjectType
+	default:
+		var value interface{}
+		if err = json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+
+		switch x := value.(type) {
+		case string:
+			v.Type = StringType
+			v.String = x
+		case float64:
+			v.Type = FloatType
+			v.Float = x
+		case int64:
+			v.Type = IntegerType
+			v.Integer = x
+		case bool:
+			v.Type = BoolType
+			v.Bool = x
+		case nil:
+			v.Type = NullType
+		default:
+			return fmt.Errorf("unhandled type %T for value %q", x, string(data))
+		}
+	}
+
+	return nil
 }
 
 func Bool(v bool) *Value {

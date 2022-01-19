@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -87,9 +86,7 @@ func (pipe *Pipeline) process(evt *pipelineEvent) ([]*pipelineEvent, error) {
 	}
 
 	if err != nil && len(pipe.onFailure) > 0 {
-		fmt.Println("running on_failure")
 		for _, proc := range pipe.onFailure {
-			fmt.Println(proc.ID)
 			var splitEvents []*pipelineEvent
 			splitEvents, err = proc.Process(evt)
 			if err != nil {

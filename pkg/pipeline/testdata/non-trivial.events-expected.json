@@ -1,0 +1,125 @@
+[
+  {
+    "Index": 0,
+    "Events": [
+      {
+        "event": {
+          "kind": "pipeline_error"
+        }
+      }
+    ]
+  },
+  {
+    "Index": 1,
+    "Events": [
+      {
+        "event": {
+          "kind": "pipeline_error"
+        },
+        "tmp": {
+          "user_email": "hello@example.com"
+        },
+        "user": {
+          "email": "hello@example.com",
+          "id": "UNKNOWN"
+        }
+      }
+    ]
+  },
+  {
+    "Index": 2,
+    "Events": [
+      {
+        "event": {
+          "kind": "pipeline_error"
+        },
+        "tmp": {
+          "user_email": 1111
+        }
+      }
+    ]
+  },
+  {
+    "Index": 3,
+    "Events": [
+      {
+        "event": {
+          "kind": "pipeline_error"
+        },
+        "tmp": {
+          "user_id": "id-2222"
+        }
+      }
+    ]
+  },
+  {
+    "Index": 4,
+    "Events": [
+      {
+        "event": {
+          "kind": "pipeline_error"
+        },
+        "tmp": {
+          "user_id": 2222
+        }
+      }
+    ]
+  },
+  {
+    "Index": 5,
+    "Events": [
+      {
+        "event": {
+          "kind": "pipeline_error"
+        },
+        "tmp": {
+          "user_roles": [
+            "ADMIN",
+            "MANAGER"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "Index": 6,
+    "Events": [
+      {
+        "event": {
+          "kind": "pipeline_error"
+        },
+        "tmp": {
+          "user_roles": [
+            3333
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "Index": 7,
+    "Events": [
+      {
+        "event": {
+          "kind": "pipeline_error"
+        },
+        "tmp": {
+          "id": "my-id"
+        }
+      }
+    ]
+  },
+  {
+    "Index": 8,
+    "Events": [
+      {
+        "event": {
+          "kind": "pipeline_error"
+        },
+        "tmp": {
+          "user_hash": "AABB1133FFEECC"
+        }
+      }
+    ]
+  }
+]

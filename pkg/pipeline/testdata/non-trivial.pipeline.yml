@@ -1,0 +1,38 @@
+---
+
+id: logs-non_trivial
+description: >-
+  This is an example pipeline.
+processors:
+  - lowercase:
+      field: tmp.user_email
+      target_field: user.email
+      ignore_missing: true
+  - lowercase:
+      field: tmp.user_id
+      target_field: user.id
+      on_failure:
+        - set:
+            target_field: user.id
+            value: UNKNOWN
+  - lowercase:
+      field: tmp.user_roles
+      target_field: user.roles
+      on_failure:
+        - set:
+            target_field: user.id.roles
+            value: FAILED
+            on_failure:
+              - set:
+                  target_field: user.roles
+                  value:
+                    - FAILURE
+  - lowercase:
+      field: tmp.user_hash
+      target_field: user.hash
+on_failure:
+  - set:
+      target_field: event.kind
+      value: pipeline_error
+      ignore_failure: true
+

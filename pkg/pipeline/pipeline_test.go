@@ -4,9 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"flag"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
@@ -273,3 +278,75 @@ func newTestEvent() *event.Event {
 	evt.Put("vehicle.tag", event.String("VCX-9833"))
 	return evt
 }
+
+func TestPipelines(t *testing.T) {
+	pipelineFiles, err := filepath.Glob("testdata/*.pipeline.yml")
+	require.NoError(t, err)
+
+	for _, name := range pipelineFiles {
+		t.Run(name, func(t *testing.T) {
+			data, err := ioutil.ReadFile(name)
+			require.NoError(t, err)
+
+			var pipelineConfig PipelineConfig
+			err = yaml.Unmarshal(data, &pipelineConfig)
+			require.NoError(t, err)
+
+			pipe, err := New(pipelineConfig)
+			require.NoError(t, err)
+
+			// Load events.
+			prefix := strings.TrimSuffix(name, ".pipeline.yml")
+			data, err = ioutil.ReadFile(prefix + ".events.json")
+			require.NoError(t, err)
+
+			type testEvents struct {
+				Events []map[string]interface{}
+			}
+			var events []*event.Event
+			err = json.Unmarshal(data, &events)
+			require.NoError(t, err)
+
+			type outputEvent struct {
+				Index  int
+				Events []*event.Event
+				Error  string `json:"error,omitempty"`
+			}
+			outputs := make([]outputEvent, 0, len(events))
+			for i, evt := range events {
+				oe := outputEvent{Index: i}
+				oe.Events, err = pipe.Process(evt)
+				if err != nil {
+					oe.Error = err.Error()
+				}
+				outputs = append(outputs, oe)
+			}
+
+			buf := new(bytes.Buffer)
+			enc := json.NewEncoder(buf)
+			enc.SetEscapeHTML(false)
+			enc.SetIndent("", "  ")
+			require.NoError(t, enc.Encode(outputs))
+
+			actualJSON := buf.Bytes()
+
+			if *generateExpected {
+				err = ioutil.WriteFile(prefix+".events-expected.json", buf.Bytes(), 0644)
+				require.NoError(t, err)
+			}
+
+			expectedJSON, err := ioutil.ReadFile(prefix + ".events-expected.json")
+			if err != nil {
+				if os.IsNotExist(err) {
+					t.Fatal("run tests with -g to generate expected file")
+				}
+				t.Fatal(err)
+			}
+			if diff := cmp.Diff(string(expectedJSON), string(actualJSON)); diff != "" {
+				t.Fatalf("Found differences:\n%s", diff)
+			}
+		})
+	}
+}
+
+var generateExpected = flag.Bool("g", false, "generate expected output")

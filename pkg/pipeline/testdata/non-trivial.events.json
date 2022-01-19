@@ -1,0 +1,49 @@
+[
+  {
+  },
+  {
+    "tmp": {
+      "user_email": "hello@example.com"
+    }
+  },
+  {
+    "tmp": {
+      "user_email": 1111
+    }
+  },
+  {
+    "tmp": {
+      "user_id": "id-2222"
+    }
+  },
+  {
+    "tmp": {
+      "user_id": 2222
+    }
+  },
+  {
+    "tmp": {
+      "user_roles": [
+        "ADMIN",
+        "MANAGER"
+      ]
+    }
+  },
+  {
+    "tmp": {
+      "user_roles": [
+        3333
+      ]
+    }
+  },
+  {
+    "tmp": {
+      "id": "my-id"
+    }
+  },
+  {
+    "tmp": {
+      "user_hash": "AABB1133FFEECC"
+    }
+  }
+]

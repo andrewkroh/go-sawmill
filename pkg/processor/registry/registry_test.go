@@ -30,15 +30,15 @@ func newDummyProc(conf DummyConfig) (*DummyProc, error) {
 
 func TestRegister(t *testing.T) {
 	r := NewRegistry()
-	c := map[string]interface{}{
+	require.NoError(t, r.Register("dummy", newDummyProc))
+
+	config := map[string]interface{}{
 		"ignore_failure": true,
 	}
-	require.NoError(t, r.Register("dummy", newDummyProc))
-	p, err := r.NewProcessor("dummy", c)
+	p, err := r.NewProcessor("dummy", config)
 	require.NoError(t, err)
-	d, ok := p.(*DummyProc)
-	assert.True(t, ok)
-	assert.True(t, d.config.IgnoreFailure)
 
-	t.Logf("%#v", p)
+	d, ok := p.(*DummyProc)
+	require.True(t, ok)
+	assert.True(t, d.config.IgnoreFailure)
 }

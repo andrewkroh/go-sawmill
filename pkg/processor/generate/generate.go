@@ -39,8 +39,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(string(data))
+	fmt.Println("Final YAML:\n", string(data))
 
 	for _, p := range p.Processors {
 		for name, data := range p {

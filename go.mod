@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/elastic/go-ucfg v0.8.4
+	github.com/google/go-cmp v0.5.5
 	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/stretchr/testify v1.7.0

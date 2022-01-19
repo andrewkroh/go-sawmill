@@ -120,6 +120,15 @@ func (e *Event) MarshalJSON() ([]byte, error) {
 	return json.Marshal(e.fields)
 }
 
+func (e *Event) UnmarshalJSON(data []byte) error {
+	var fields map[string]*Value
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+	e.fields = fields
+	return nil
+}
+
 // keyToPath creates an object path from a dot-separated key. If a path name
 // contains a dot then the dot must be escaped by a backslash.
 //

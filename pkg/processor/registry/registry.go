@@ -99,7 +99,6 @@ func validateConfig(i interface{}) (*processorConstructor, error) {
 		return nil, fmt.Errorf("function must return 2 values")
 	}
 	processorType := t.Out(0)
-	fmt.Println(processorType)
 	if processorType.Kind() != reflect.Ptr {
 		return nil, fmt.Errorf("function should return a pointer to a processor struct")
 	}
