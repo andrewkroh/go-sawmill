@@ -12,6 +12,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/andrewkroh/go-event-pipeline/pkg/event"
+
 	// Register processors for testing purposes.
 	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/lowercase"
 	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/set"
@@ -134,13 +135,10 @@ func getProcessor(m map[string]ProcessorOptionConfig) (string, ProcessorOptionCo
 
 func TestPipeline(t *testing.T) {
 	t.Run("no errors", func(t *testing.T) {
-		evt := newTestEvent()
-
 		pipe, err := New(samplePipeline())
 		require.NoError(t, err)
 
-		pipelineEvent := &Event{data: evt}
-		evts, err := pipe.Process(pipelineEvent)
+		evts, err := pipe.Process(newTestEvent())
 		require.NoError(t, err)
 		require.Len(t, evts, 1)
 
@@ -151,8 +149,6 @@ func TestPipeline(t *testing.T) {
 	})
 
 	t.Run("processor err", func(t *testing.T) {
-		evt := newTestEvent()
-
 		pipeline := PipelineConfig{
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
@@ -168,8 +164,7 @@ func TestPipeline(t *testing.T) {
 		pipe, err := New(pipeline)
 		require.NoError(t, err)
 
-		pipelineEvent := &Event{data: evt}
-		evts, err := pipe.Process(pipelineEvent)
+		evts, err := pipe.Process(newTestEvent())
 		require.Error(t, err)
 		require.Nil(t, evts)
 
@@ -177,8 +172,6 @@ func TestPipeline(t *testing.T) {
 	})
 
 	t.Run("processor err with local on_failure", func(t *testing.T) {
-		evt := newTestEvent()
-
 		pipeline := PipelineConfig{
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
@@ -204,8 +197,7 @@ func TestPipeline(t *testing.T) {
 		pipe, err := New(pipeline)
 		require.NoError(t, err)
 
-		pipelineEvent := &Event{data: evt}
-		evts, err := pipe.Process(pipelineEvent)
+		evts, err := pipe.Process(newTestEvent())
 		require.NoError(t, err)
 		require.Len(t, evts, 1)
 
@@ -216,8 +208,6 @@ func TestPipeline(t *testing.T) {
 	})
 
 	t.Run("pipeline err with global on_failure", func(t *testing.T) {
-		evt := newTestEvent()
-
 		pipeline := PipelineConfig{
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
@@ -243,8 +233,7 @@ func TestPipeline(t *testing.T) {
 		pipe, err := New(pipeline)
 		require.NoError(t, err)
 
-		pipelineEvent := &Event{data: evt}
-		evts, err := pipe.Process(pipelineEvent)
+		evts, err := pipe.Process(newTestEvent())
 		require.NoError(t, err)
 		require.Len(t, evts, 1)
 
@@ -255,8 +244,6 @@ func TestPipeline(t *testing.T) {
 	})
 
 	t.Run("pipeline err no global on_failure", func(t *testing.T) {
-		evt := newTestEvent()
-
 		pipeline := PipelineConfig{
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
@@ -272,8 +259,7 @@ func TestPipeline(t *testing.T) {
 		pipe, err := New(pipeline)
 		require.NoError(t, err)
 
-		pipelineEvent := &Event{data: evt}
-		evts, err := pipe.Process(pipelineEvent)
+		evts, err := pipe.Process(newTestEvent())
 		require.Error(t, err)
 		require.Nil(t, evts)
 
