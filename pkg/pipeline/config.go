@@ -7,7 +7,7 @@ import (
 
 type ConditionalExpressionConfig string
 
-type PipelineConfig struct {
+type Config struct {
 	ID          string            `yaml:"id,omitempty"          json:"id,omitempty"`
 	Description string            `yaml:"description,omitempty" json:"description,omitempty"`
 	Processors  []ProcessorConfig `yaml:"processors,omitempty"  json:"processors,omitempty"`

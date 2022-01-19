@@ -16,7 +16,7 @@ var pipe *pipeline.Pipeline
 
 //export Load
 func Load(jsonPipeline *C.char) int32 {
-	var config pipeline.PipelineConfig
+	var config pipeline.Config
 	if err := json.Unmarshal([]byte(C.GoString(jsonPipeline)), &config); err != nil {
 		fmt.Println(err)
 		return 1

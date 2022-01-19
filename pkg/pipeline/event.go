@@ -7,6 +7,8 @@ import (
 
 var _ processor.Event = (*pipelineEvent)(nil)
 
+// pipelineEvent implements the processor.Event interface. It wraps an
+// event.Event and contains state about the event w.r.t. the pipeline.
 type pipelineEvent struct {
 	data      *event.Event
 	cancelled bool
