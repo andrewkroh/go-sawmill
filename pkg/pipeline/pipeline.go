@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor/registry"
-
 	"github.com/prometheus/client_golang/prometheus"
 
+	"github.com/andrewkroh/go-event-pipeline/pkg/event"
 	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
+	"github.com/andrewkroh/go-event-pipeline/pkg/processor/registry"
 )
 
 type Processor interface {
-	Process(event *Event) ([]*Event, error)
+	Process(event *pipelineEvent) ([]*pipelineEvent, error)
 }
 
-var _ Processor = (*Pipeline)(nil)
+//var _ Processor = (*Pipeline)(nil)
 
 type Pipeline struct {
 	id         string
@@ -24,7 +24,7 @@ type Pipeline struct {
 	onFailure  []*pipelineProcessor
 }
 
-func New(config PipelineConfig) (Processor, error) {
+func New(config PipelineConfig) (*Pipeline, error) {
 	if config.ID == "" {
 		return nil, errors.New("pipeline must have a non-empty id")
 	}
@@ -45,14 +45,39 @@ func New(config PipelineConfig) (Processor, error) {
 	}, nil
 }
 
+// Process transforms an event by processing it through the pipeline. There
+// are four cases that callers should expect for return values.
+//
+//   Event pass through - The input event is returned as index 0 of the slice.
+//   Dropped event - Empty slice and nil error.
+//   Processing error - Empty slice and non-nil error.
+//   Event split - Slice length is greater than 1 and non-nil error.
+func (pipe *Pipeline) Process(evt *event.Event) ([]*event.Event, error) {
+	pipeEvt := &pipelineEvent{data: evt}
+
+	pipeEvts, err := pipe.process(pipeEvt)
+	if err != nil {
+		return nil, err
+	}
+
+	var out []*event.Event
+	for _, evt := range pipeEvts {
+		if !evt.dropped {
+			out = append(out, evt.data)
+		}
+	}
+
+	return out, nil
+}
+
 // TODO: There might need to be an internal and external facing interface.
 // Outside users will have an event.Event while internally we will pass
 // a processor.Event that allow the additional of metadata and an explicit
 // drop method.
-func (pipe *Pipeline) Process(evt *Event) ([]*Event, error) {
+func (pipe *Pipeline) process(evt *pipelineEvent) ([]*pipelineEvent, error) {
 	var err error
 	for _, proc := range pipe.processors {
-		var splitEvents []*Event
+		var splitEvents []*pipelineEvent
 		splitEvents, err = proc.Process(evt)
 		if err != nil {
 			// OnFailure
@@ -65,7 +90,7 @@ func (pipe *Pipeline) Process(evt *Event) ([]*Event, error) {
 		fmt.Println("running on_failure")
 		for _, proc := range pipe.onFailure {
 			fmt.Println(proc.ID)
-			var splitEvents []*Event
+			var splitEvents []*pipelineEvent
 			splitEvents, err = proc.Process(evt)
 			if err != nil {
 				return nil, err
@@ -78,7 +103,7 @@ func (pipe *Pipeline) Process(evt *Event) ([]*Event, error) {
 		return nil, err
 	}
 
-	return []*Event{evt}, nil
+	return []*pipelineEvent{evt}, nil
 }
 
 type pipelineProcessor struct {
@@ -86,7 +111,7 @@ type pipelineProcessor struct {
 	Condition     string
 	IgnoreFailure bool
 	IgnoreMissing bool
-	process       func(event *Event) ([]*Event, error)
+	process       func(event *pipelineEvent) ([]*pipelineEvent, error)
 	OnFailure     []*pipelineProcessor
 
 	// Metrics
@@ -95,7 +120,7 @@ type pipelineProcessor struct {
 	eventsDropped prometheus.Counter
 }
 
-func (p *pipelineProcessor) Process(event *Event) ([]*Event, error) {
+func (p *pipelineProcessor) Process(event *pipelineEvent) ([]*pipelineEvent, error) {
 	// TODO: Check the type of processor (single vs split).
 	_, err := p.process(event)
 
@@ -111,7 +136,7 @@ func (p *pipelineProcessor) Process(event *Event) ([]*Event, error) {
 		return nil, err
 	}
 
-	return []*Event{event}, nil
+	return []*pipelineEvent{event}, nil
 }
 
 func newPipelineProcessors(baseID string, procConfigs []ProcessorConfig) ([]*pipelineProcessor, error) {
@@ -138,7 +163,8 @@ func newPipelineProcessors(baseID string, procConfigs []ProcessorConfig) ([]*pip
 }
 
 func newPipelineProcessor(baseID string, processorIndex int, processorType string, config ProcessorOptionConfig) (*pipelineProcessor, error) {
-	id := baseID + "[" + strconv.Itoa(processorIndex) + "]"
+	// Psuedo JSON XPath expression.
+	id := baseID + "[" + strconv.Itoa(processorIndex) + "]." + processorType
 
 	labels := map[string]string{
 		"component_kind": "processor",
@@ -160,11 +186,11 @@ func newPipelineProcessor(baseID string, processorIndex int, processorType strin
 	p := &pipelineProcessor{
 		ID: id,
 		//Condition: config.If,
-		process: func(event *Event) ([]*Event, error) {
+		process: func(event *pipelineEvent) ([]*pipelineEvent, error) {
 			if err := proc.Process(event); err != nil {
 				return nil, err
 			}
-			return []*Event{event}, nil
+			return []*pipelineEvent{event}, nil
 		},
 		OnFailure: onFailureProcessors,
 		eventsIn: prometheus.NewCounter(prometheus.CounterOpts{

@@ -3,6 +3,8 @@ package event
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 )
 
 var (
@@ -40,7 +42,7 @@ func (e *Event) TryPut(key string, val *Value) (existing *Value, err error) {
 
 func (e *Event) put(path []string, val *Value, overwrite bool) (old *Value, err error) {
 	if len(path) == 0 {
-		return nil, ErrEmptyKey
+		return nil, fmt.Errorf("event put failed: %w", ErrEmptyKey)
 	}
 	if val == nil {
 		return nil, nil
@@ -52,7 +54,7 @@ func (e *Event) put(path []string, val *Value, overwrite bool) (old *Value, err 
 
 	old = e.get(path)
 	if old != nil && !overwrite {
-		return old, ErrKeyExists
+		return old, fmt.Errorf("event put failed for path <%s>: %w", pathString(path), ErrKeyExists)
 	}
 
 	m := e.fields
@@ -60,7 +62,7 @@ func (e *Event) put(path []string, val *Value, overwrite bool) (old *Value, err 
 		inner, found := m[key]
 		if found {
 			if inner.Type != ObjectType {
-				return nil, ErrTargetKeyNotObject
+				return nil, fmt.Errorf("event put failed for path <%s>: %w", pathString(path), ErrTargetKeyNotObject)
 			}
 			m = inner.Object
 			continue
@@ -152,4 +154,21 @@ func keyToPath(key string) []string {
 	}
 
 	return paths
+}
+
+func pathString(path []string) string {
+	switch len(path) {
+	case 0:
+		return "/"
+	case 1:
+		return "/" + path[0]
+	}
+
+	var sb strings.Builder
+	for _, elem := range path {
+		sb.WriteByte('/')
+		sb.WriteString(elem)
+	}
+
+	return sb.String()
 }

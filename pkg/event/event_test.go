@@ -257,3 +257,11 @@ func TestKeyToPath(t *testing.T) {
 		assert.Equal(t, tc.path, observedPath, "expected key=%q to produce [%s]", tc.key, strings.Join(tc.path, ", "))
 	}
 }
+
+func TestPathString(t *testing.T) {
+	assert.Equal(t, "/", pathString(nil))
+	assert.Equal(t, "/", pathString([]string{}))
+	assert.Equal(t, "/event", pathString([]string{"event"}))
+	assert.Equal(t, "/event/ingested", pathString([]string{"event", "ingested"}))
+	assert.Equal(t, "/ecs.version", pathString([]string{"ecs.version"}))
+}

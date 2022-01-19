@@ -7,14 +7,6 @@ import (
 	"github.com/andrewkroh/go-event-pipeline/pkg/event"
 )
 
-type ErrorKeyMissing struct {
-	Key string
-}
-
-func (e ErrorKeyMissing) Error() string {
-	return "key <" + e.Key + "> is missing from event"
-}
-
 type Event interface {
 	Put(key string, v *event.Value) (*event.Value, error)
 	TryPut(key string, v *event.Value) (*event.Value, error)
