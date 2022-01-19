@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Go wasm - XMLHttpRequest (XHR)</title>
+</head>
+<body>
+<p>Please open developer console to see the JSON output.</p>
+
+<!-- https://github.com/golang/go/blob/master/misc/wasm/wasm_exec.js -->
+<script src="wasm_exec.js"></script>
+<script>
+    const go = new Go();
+    let mod, inst;
+    WebAssembly.instantiateStreaming(
+        fetch("pipeline.wasm", {cache: 'no-cache'}), go.importObject).then((result) => {
+        mod = result.module;
+        inst = result.instance;
+        run();
+    });
+    async function run() {
+        await go.run(inst);
+    };
+
+    function demo() {
+        var pipeline = {id: "foo", processors: [{"lowercase": {"field": "user_name"}}]};
+        var input = {"user_name": "Andrew Kroh"};
+        var out = pipeline_execute(JSON.stringify(pipeline), JSON.stringify(input));
+
+        console.log("pipeline =", JSON.stringify(pipeline));
+        console.log("input = ", JSON.stringify(input));
+        console.log("output = ", JSON.stringify(out));
+    }
+</script>
+
+<button onclick="demo()">Demo</button>
+</body>
+</html>
