@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -350,3 +351,173 @@ func TestPipelines(t *testing.T) {
 }
 
 var generateExpected = flag.Bool("g", false, "generate expected output")
+
+func TestExecute(t *testing.T) {
+	pipeline := pipe{
+		id: "root",
+		procs: []pipe{
+			{
+				id:    "A",
+			},
+			{
+				id:    "B",
+			},
+			{
+				id:    "C",
+			},
+			{
+				id:    "D",
+				fail: []pipe{
+					{
+						id:    "D1",
+					},
+					{
+						id:    "D2",
+					},
+				},
+			},
+			{
+				id:    "E",
+			},
+		},
+		fail: []pipe{
+			{
+				id:    "F",
+			},
+		},
+	}
+
+	rootProc := pipelineToGraph(&pipeline)
+	assert.Equal(t, "A", rootProc.next.id)
+	assert.Equal(t, "B", rootProc.next.next.id)
+	assert.Equal(t, "C", rootProc.next.next.next.id)
+	assert.Equal(t, "D", rootProc.next.next.next.next.id)
+	assert.Equal(t, "D1", rootProc.next.next.next.next.fail.id)
+	assert.Equal(t, "D2", rootProc.next.next.next.next.fail.next.id)
+	assert.Equal(t, "E", rootProc.next.next.next.next.next.id)
+	assert.Equal(t, "F", rootProc.fail.id)
+	fmt.Println(execute(rootProc))
+
+
+	p := &proc{
+		do: makeDo("A", false),
+		next: &proc{
+			do:   makeDo("B", true),
+			fail: &proc{do: makeDo("C", true)},
+		},
+	}
+	fmt.Println(execute(p))
+
+	root := makeNode("root", false, nil)
+	a := makeNode("A", false, root)
+	b := makeNode("B", true, a)
+	b.fail = makeNode("B.1", false, nil)
+	fail2 := makeNode("B.2", true, b.fail)
+	fail2.fail = makeNode("B.2.1", false, nil)
+
+	_ = makeNode("C", false, b)
+	fmt.Println(execute(root))
+}
+
+func pipelineToGraph(pipe *pipe) *proc {
+	return &proc{
+		id: pipe.id,
+		do: makeDo(pipe.id, false),
+		next: pipelineProcsToGraph(pipe.procs),
+		fail: pipelineProcsToGraph(pipe.fail),
+	}
+}
+
+func pipelineProcsToGraph(pipes []pipe) *proc {
+	var list []*proc
+	for _, p := range pipes {
+		list = append(list, pipelineToGraph(&p))
+	}
+	if len(list) == 0 {
+		return nil
+	}
+	item := list[0]
+	for _, pr := range list[1:] {
+		item.next = pr
+		item = pr
+	}
+	return list[0]
+}
+
+func makeNode(name string, fail bool, parent *proc) *proc {
+	n := &proc{
+		id: name,
+		do: makeDo(name, fail),
+	}
+	if parent != nil {
+		parent.next = n
+	}
+	return n
+}
+
+func makeDo(name string, fail bool) func() error {
+	return func() error {
+		fmt.Printf("%s->", name)
+		if fail {
+			return fmt.Errorf("failed in %s", name)
+		}
+		return nil
+	}
+}
+
+type pipe struct {
+	id    string
+	procs []pipe
+	fail  []pipe
+}
+
+type proc struct {
+	id   string
+	do   func() error
+	next *proc
+	fail *proc
+}
+
+func execute(p *proc) error {
+	stack := &stack{}
+	stack.Push(p)
+
+	for stack.Len() > 0 {
+		x := stack.Pop()
+
+		if x.next != nil {
+			stack.Push(x.next)
+		}
+
+		if err := x.do(); err != nil {
+			if x.fail != nil {
+				stack.Push(x.fail)
+				continue
+			}
+			return err
+		}
+	}
+	return nil
+}
+
+type stack struct {
+	data []*proc
+}
+
+func (s *stack) Push(p *proc) {
+	s.data = append(s.data, p)
+}
+
+func (s *stack) Pop() *proc {
+	size := len(s.data)
+	if size == 0 {
+		return nil
+	}
+	item := s.data[size-1]
+	s.data = s.data[:size-1]
+	return item
+}
+
+func (s *stack) Len() int {
+	return len(s.data)
+}
