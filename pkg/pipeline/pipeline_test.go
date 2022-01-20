@@ -12,6 +12,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/andrewkroh/go-event-pipeline/pkg/util"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -353,76 +355,153 @@ func TestPipelines(t *testing.T) {
 var generateExpected = flag.Bool("g", false, "generate expected output")
 
 func TestExecute(t *testing.T) {
-	pipeline := pipe{
-		id: "root",
-		procs: []pipe{
-			{
-				id:    "A",
-			},
-			{
-				id:    "B",
-			},
-			{
-				id:    "C",
-			},
-			{
-				id:    "D",
-				fail: []pipe{
-					{
-						id:    "D1",
+	t.Run("success", func(t *testing.T) {
+
+		pipeline := pipe{
+			id: "root",
+			procs: []pipe{
+				{
+					id: "A",
+				},
+				{
+					id: "B",
+				},
+				{
+					id: "C",
+				},
+				{
+					id: "D",
+					fail: []pipe{
+						{
+							id: "D1",
+						},
+						{
+							id: "D2",
+						},
 					},
-					{
-						id:    "D2",
+				},
+				{
+					id: "E",
+				},
+			},
+			fail: []pipe{
+				{
+					id: "F",
+				},
+			},
+		}
+
+		rootProc := pipelineToGraph(&pipeline)
+		assert.Equal(t, "A", rootProc.next.id)
+		assert.Equal(t, "B", rootProc.next.next.id)
+		assert.Equal(t, "C", rootProc.next.next.next.id)
+		assert.Equal(t, "D", rootProc.next.next.next.next.id)
+		assert.Equal(t, "D1", rootProc.next.next.next.next.fail.id)
+		assert.Equal(t, "D2", rootProc.next.next.next.next.fail.next.id)
+		assert.Equal(t, "E", rootProc.next.next.next.next.next.id)
+		assert.Equal(t, "F", rootProc.fail.id)
+
+		fmt.Println(graphToString(rootProc))
+
+		out, err := execute(newTestEvent(), rootProc)
+		if assert.NoError(t, err) {
+			fmt.Println()
+			for i, e := range out {
+				j, _ := e.MarshalJSON()
+				assert.Contains(t, string(j), `"root","A","B","C","D","E"`)
+				fmt.Printf("%d: %v", i, string(j))
+			}
+			fmt.Println()
+		}
+	})
+
+	t.Run("global-on_failure", func(t *testing.T) {
+		pipeline := pipe{
+			id: "root",
+			procs: []pipe{
+				{
+					id: "A",
+				},
+				{
+					id: "B-fail",
+					fail: []pipe{
+						{
+							id: "C-fail",
+						},
 					},
 				},
 			},
-			{
-				id:    "E",
+			fail: []pipe{
+				{
+					id: "D",
+				},
 			},
-		},
-		fail: []pipe{
-			{
-				id:    "F",
-			},
-		},
+		}
+
+		p := pipelineToGraph(&pipeline)
+		fmt.Println(graphToString(p))
+
+		out, err := execute(newTestEvent(), p)
+		if assert.NoError(t, err) {
+			fmt.Println()
+			for i, e := range out {
+				j, _ := e.MarshalJSON()
+				assert.Contains(t, string(j), `"root","A","B-fail","C-fail","D"`)
+				fmt.Printf("%d: %v", i, string(j))
+			}
+			fmt.Println()
+		}
+	})
+
+	t.Run("branching failures", func(t *testing.T) {
+		root := makeNode("root", nil)
+		a := makeNode("A", root)
+		b := makeNode("B-fail", a)
+		b.fail = makeNode("B.1", nil)
+		fail2 := makeNode("B.2-fail", b.fail)
+		fail2.fail = makeNode("B.2.1", nil)
+
+		_ = makeNode("C", b)
+
+		fmt.Println(graphToString(root))
+
+		out, err := execute(newTestEvent(), root)
+		if assert.NoError(t, err) {
+			fmt.Println()
+			for i, e := range out {
+				j, _ := e.MarshalJSON()
+				assert.Contains(t, string(j), `"root","A","B-fail","B.1","B.2-fail","B.2.1","C"`)
+				fmt.Printf("%d: %v", i, string(j))
+			}
+			fmt.Println()
+		}
+	})
+}
+
+func graphToString(p *proc) string {
+	var sb strings.Builder
+	addGraphNode(p, 0, &sb)
+	return sb.String()
+}
+
+func addGraphNode(p *proc, indent int, sb *strings.Builder) {
+	sb.WriteString(strings.Repeat(" ", indent))
+	sb.WriteString(p.id)
+	sb.WriteByte('\n')
+	if p.fail != nil {
+		sb.WriteString(strings.Repeat(" ", indent))
+		sb.WriteString("|--\n")
+		addGraphNode(p.fail, indent+2, sb)
 	}
-
-	rootProc := pipelineToGraph(&pipeline)
-	assert.Equal(t, "A", rootProc.next.id)
-	assert.Equal(t, "B", rootProc.next.next.id)
-	assert.Equal(t, "C", rootProc.next.next.next.id)
-	assert.Equal(t, "D", rootProc.next.next.next.next.id)
-	assert.Equal(t, "D1", rootProc.next.next.next.next.fail.id)
-	assert.Equal(t, "D2", rootProc.next.next.next.next.fail.next.id)
-	assert.Equal(t, "E", rootProc.next.next.next.next.next.id)
-	assert.Equal(t, "F", rootProc.fail.id)
-	fmt.Println(execute(rootProc))
-
-
-	p := &proc{
-		do: makeDo("A", false),
-		next: &proc{
-			do:   makeDo("B", true),
-			fail: &proc{do: makeDo("C", true)},
-		},
+	if p.next != nil {
+		addGraphNode(p.next, indent, sb)
 	}
-	fmt.Println(execute(p))
-
-	root := makeNode("root", false, nil)
-	a := makeNode("A", false, root)
-	b := makeNode("B", true, a)
-	b.fail = makeNode("B.1", false, nil)
-	fail2 := makeNode("B.2", true, b.fail)
-	fail2.fail = makeNode("B.2.1", false, nil)
-
-	_ = makeNode("C", false, b)
-	fmt.Println(execute(root))
 }
 
 func pipelineToGraph(pipe *pipe) *proc {
 	return &proc{
-		id: pipe.id,
-		do: makeDo(pipe.id, false),
+		id:   pipe.id,
+		do:   makeDo(pipe.id),
 		next: pipelineProcsToGraph(pipe.procs),
 		fail: pipelineProcsToGraph(pipe.fail),
 	}
@@ -444,10 +523,10 @@ func pipelineProcsToGraph(pipes []pipe) *proc {
 	return list[0]
 }
 
-func makeNode(name string, fail bool, parent *proc) *proc {
+func makeNode(name string, parent *proc) *proc {
 	n := &proc{
 		id: name,
-		do: makeDo(name, fail),
+		do: makeDo(name),
 	}
 	if parent != nil {
 		parent.next = n
@@ -455,13 +534,14 @@ func makeNode(name string, fail bool, parent *proc) *proc {
 	return n
 }
 
-func makeDo(name string, fail bool) func() error {
-	return func() error {
-		fmt.Printf("%s->", name)
-		if fail {
-			return fmt.Errorf("failed in %s", name)
+func makeDo(name string) func(event *event.Event) ([]*event.Event, error) {
+	return func(evt *event.Event) ([]*event.Event, error) {
+		//fmt.Printf("%s->", name)
+		util.Append(evt, "path", event.String(name))
+		if strings.Contains(name, "fail") {
+			return nil, fmt.Errorf("failed in %s", name)
 		}
-		return nil
+		return []*event.Event{evt}, nil
 	}
 }
 
@@ -473,15 +553,21 @@ type pipe struct {
 
 type proc struct {
 	id   string
-	do   func() error
+	do   func(event *event.Event) ([]*event.Event, error)
 	next *proc
 	fail *proc
 }
 
-func execute(p *proc) error {
+func execute(evt *event.Event, p *proc) ([]*event.Event, error) {
 	stack := &stack{}
+	if p.fail != nil {
+		stack.Push(p.fail)
+	}
 	stack.Push(p)
+	return executeStack(evt, stack)
+}
 
+func executeStack(evt *event.Event, stack *stack) ([]*event.Event, error) {
 	for stack.Len() > 0 {
 		x := stack.Pop()
 
@@ -489,15 +575,39 @@ func execute(p *proc) error {
 			stack.Push(x.next)
 		}
 
-		if err := x.do(); err != nil {
+		out, err := x.do(evt)
+		if err != nil {
 			if x.fail != nil {
 				stack.Push(x.fail)
 				continue
 			}
-			return err
+			fmt.Println(len(stack.data))
+			for _, node := range stack.data {
+				fmt.Println(node.id, node.fail != nil)
+			}
+			return nil, err
+		}
+
+		switch {
+		case len(out) > 1:
+			// Process each event individually from here.
+			var accumulate []*event.Event
+			for _, evt := range out {
+				splitOut, err := executeStack(evt, stack.Clone())
+				if err != nil {
+					return nil, err
+				}
+				accumulate = append(accumulate, splitOut...)
+			}
+			return accumulate, nil
+		case len(out) == 1:
+			evt = out[0]
+		case len(out) == 0:
+			return nil, nil
 		}
 	}
-	return nil
+
+	return []*event.Event{evt}, nil
 }
 
 type stack struct {
@@ -520,4 +630,12 @@ func (s *stack) Pop() *proc {
 
 func (s *stack) Len() int {
 	return len(s.data)
+}
+
+func (s *stack) Clone() *stack {
+	data := make([]*proc, len(s.data))
+	copy(data, s.data)
+	return &stack{
+		data: data,
+	}
 }
