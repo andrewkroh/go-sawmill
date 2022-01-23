@@ -82,8 +82,12 @@ func (e *Event) Get(key string) *Value {
 }
 
 func (e *Event) get(path []string) *Value {
-	if len(path) == 0 || len(e.fields) == 0 {
+	if len(e.fields) == 0 {
 		return nil
+	}
+	if len(path) == 0 {
+		// Return root object.
+		return Object(e.fields)
 	}
 
 	m := e.fields

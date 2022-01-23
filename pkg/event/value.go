@@ -159,8 +159,8 @@ func String(v string) *Value {
 	return &Value{Type: StringType, String: v}
 }
 
-func Timestamp(v Time) *Value {
-	return &Value{Type: TimestampType, Timestamp: v}
+func Timestamp(unixNanos int64) *Value {
+	return &Value{Type: TimestampType, Timestamp: Time{unixNanos}}
 }
 
 func Array(v ...*Value) *Value {

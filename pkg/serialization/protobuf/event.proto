@@ -1,0 +1,41 @@
+syntax = "proto3";
+package protobuf;
+
+message MessageWrapper {
+  oneof message {
+    Log log = 1;
+  }
+}
+
+message Log {
+  ValueObject object = 1;
+}
+
+message Value {
+  oneof kind {
+    ValueNull null = 1;
+    ValueArray array = 2;
+    bool boolean = 3;
+    double float = 4;
+    int64 integer = 5;
+    ValueObject object = 6;
+    bytes string = 7;
+    int64 timestamp = 8;
+    uint64 unsigned_integer = 9;
+  }
+}
+
+message ValueArray {
+  repeated Value items = 1;
+}
+
+message ValueObject {
+  map<string, Value> fields = 1;
+}
+
+// `ValueNull` is a singleton enumeration to represent the null value for the
+// `Value` type union.
+enum ValueNull {
+  // Null value.
+  NULL_VALUE = 0;
+}

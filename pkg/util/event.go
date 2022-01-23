@@ -1,7 +1,14 @@
 package util
 
-import "github.com/andrewkroh/go-event-pipeline/pkg/event"
+import (
+	"strings"
 
+	"github.com/andrewkroh/go-event-pipeline/pkg/event"
+)
+
+// Append appends a value to an existing array. If a non-array value
+// already exists then the value becomes the first element in the new
+// array. This function does not deduplicate.
 func Append(evt *event.Event, key string, item *event.Value) error {
 	if item == nil {
 		return nil
@@ -27,4 +34,13 @@ func Append(evt *event.Event, key string, item *event.Value) error {
 	// Overwrite the existing value.
 	_, err := evt.Put(key, targetValue)
 	return err
+}
+
+// EscapeKey escapes dots contained in a key. This is non-idempotent
+// (do not use it on a key that is already escaped).
+func EscapeKey(key string) string {
+	if strings.IndexByte(key, '.') == -1 {
+		return key
+	}
+	return strings.ReplaceAll(key, ".", `\.`)
 }

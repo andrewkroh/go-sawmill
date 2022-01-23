@@ -14,7 +14,7 @@ func ExampleEvent() {
 	e := New()
 	e.Put("event.category", Array(String("network"), String("authentication")))
 	e.Put("event.type", Array(String("denied")))
-	e.Put("event.created", Timestamp(Time{testTimeUnix}))
+	e.Put("event.created", Timestamp(testTimeUnix))
 	e.Put("foo\\.bar", Integer(1))
 
 	data, err := json.MarshalIndent(e, "", "  ")
@@ -110,7 +110,16 @@ func TestEventGet(t *testing.T) {
 		e := New()
 		e.init()
 		e.fields["a"] = val
-		e.Get("a")
+		assert.Equal(t, val, e.Get("a"))
+	})
+
+	t.Run("get root", func(t *testing.T) {
+		e := New()
+		e.init()
+		e.fields["a"] = val
+		assert.Equal(t, Object(map[string]*Value{
+			"a": val,
+		}), e.Get("."))
 	})
 
 	t.Run("get nested", func(t *testing.T) {

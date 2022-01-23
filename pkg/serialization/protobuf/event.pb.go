@@ -6,11 +6,11 @@ package protobuf
 import (
 	encoding_binary "encoding/binary"
 	fmt "fmt"
-	types "github.com/gogo/protobuf/types"
-	proto "github.com/golang/protobuf/proto"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+
+	proto "github.com/golang/protobuf/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -24,9 +24,12 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// `ValueNull` is a singleton enumeration to represent the null value for the
+// `Value` type union.
 type ValueNull int32
 
 const (
+	// Null value.
 	ValueNull_NULL_VALUE ValueNull = 0
 )
 
@@ -46,78 +49,27 @@ func (ValueNull) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_2d17a9d3f0ddf27e, []int{0}
 }
 
-type StatisticKind int32
-
-const (
-	StatisticKind_Histogram StatisticKind = 0
-	StatisticKind_Summary   StatisticKind = 1
-)
-
-var StatisticKind_name = map[int32]string{
-	0: "Histogram",
-	1: "Summary",
+type MessageWrapper struct {
+	// Types that are valid to be assigned to Message:
+	//	*MessageWrapper_Log
+	Message              isMessageWrapper_Message `protobuf_oneof:"message"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_unrecognized     []byte                   `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
 }
 
-var StatisticKind_value = map[string]int32{
-	"Histogram": 0,
-	"Summary":   1,
-}
-
-func (x StatisticKind) String() string {
-	return proto.EnumName(StatisticKind_name, int32(x))
-}
-
-func (StatisticKind) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{1}
-}
-
-type Metric_Kind int32
-
-const (
-	Metric_Incremental Metric_Kind = 0
-	Metric_Absolute    Metric_Kind = 1
-)
-
-var Metric_Kind_name = map[int32]string{
-	0: "Incremental",
-	1: "Absolute",
-}
-
-var Metric_Kind_value = map[string]int32{
-	"Incremental": 0,
-	"Absolute":    1,
-}
-
-func (x Metric_Kind) String() string {
-	return proto.EnumName(Metric_Kind_name, int32(x))
-}
-
-func (Metric_Kind) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{5, 0}
-}
-
-type EventWrapper struct {
-	// Types that are valid to be assigned to Event:
-	//	*EventWrapper_Log
-	//	*EventWrapper_Metric
-	Event                isEventWrapper_Event `protobuf_oneof:"event"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
-}
-
-func (m *EventWrapper) Reset()         { *m = EventWrapper{} }
-func (m *EventWrapper) String() string { return proto.CompactTextString(m) }
-func (*EventWrapper) ProtoMessage()    {}
-func (*EventWrapper) Descriptor() ([]byte, []int) {
+func (m *MessageWrapper) Reset()         { *m = MessageWrapper{} }
+func (m *MessageWrapper) String() string { return proto.CompactTextString(m) }
+func (*MessageWrapper) ProtoMessage()    {}
+func (*MessageWrapper) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2d17a9d3f0ddf27e, []int{0}
 }
-func (m *EventWrapper) XXX_Unmarshal(b []byte) error {
+func (m *MessageWrapper) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *EventWrapper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MessageWrapper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_EventWrapper.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MessageWrapper.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -127,68 +79,56 @@ func (m *EventWrapper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *EventWrapper) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EventWrapper.Merge(m, src)
+func (m *MessageWrapper) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MessageWrapper.Merge(m, src)
 }
-func (m *EventWrapper) XXX_Size() int {
+func (m *MessageWrapper) XXX_Size() int {
 	return m.Size()
 }
-func (m *EventWrapper) XXX_DiscardUnknown() {
-	xxx_messageInfo_EventWrapper.DiscardUnknown(m)
+func (m *MessageWrapper) XXX_DiscardUnknown() {
+	xxx_messageInfo_MessageWrapper.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_EventWrapper proto.InternalMessageInfo
+var xxx_messageInfo_MessageWrapper proto.InternalMessageInfo
 
-type isEventWrapper_Event interface {
-	isEventWrapper_Event()
+type isMessageWrapper_Message interface {
+	isMessageWrapper_Message()
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
-type EventWrapper_Log struct {
+type MessageWrapper_Log struct {
 	Log *Log `protobuf:"bytes,1,opt,name=log,proto3,oneof" json:"log,omitempty"`
 }
-type EventWrapper_Metric struct {
-	Metric *Metric `protobuf:"bytes,2,opt,name=metric,proto3,oneof" json:"metric,omitempty"`
-}
 
-func (*EventWrapper_Log) isEventWrapper_Event()    {}
-func (*EventWrapper_Metric) isEventWrapper_Event() {}
+func (*MessageWrapper_Log) isMessageWrapper_Message() {}
 
-func (m *EventWrapper) GetEvent() isEventWrapper_Event {
+func (m *MessageWrapper) GetMessage() isMessageWrapper_Message {
 	if m != nil {
-		return m.Event
+		return m.Message
 	}
 	return nil
 }
 
-func (m *EventWrapper) GetLog() *Log {
-	if x, ok := m.GetEvent().(*EventWrapper_Log); ok {
+func (m *MessageWrapper) GetLog() *Log {
+	if x, ok := m.GetMessage().(*MessageWrapper_Log); ok {
 		return x.Log
 	}
 	return nil
 }
 
-func (m *EventWrapper) GetMetric() *Metric {
-	if x, ok := m.GetEvent().(*EventWrapper_Metric); ok {
-		return x.Metric
-	}
-	return nil
-}
-
 // XXX_OneofWrappers is for the internal use of the proto package.
-func (*EventWrapper) XXX_OneofWrappers() []interface{} {
+func (*MessageWrapper) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*EventWrapper_Log)(nil),
-		(*EventWrapper_Metric)(nil),
+		(*MessageWrapper_Log)(nil),
 	}
 }
 
 type Log struct {
-	Fields               map[string]*Value `protobuf:"bytes,1,rep,name=fields,proto3" json:"fields,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	Object               *ValueObject `protobuf:"bytes,1,opt,name=object,proto3" json:"object,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
 }
 
 func (m *Log) Reset()         { *m = Log{} }
@@ -224,32 +164,42 @@ func (m *Log) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Log proto.InternalMessageInfo
 
-func (m *Log) GetFields() map[string]*Value {
+func (m *Log) GetObject() *ValueObject {
 	if m != nil {
-		return m.Fields
+		return m.Object
 	}
 	return nil
 }
 
-type ValueMap struct {
-	Fields               map[string]*Value `protobuf:"bytes,1,rep,name=fields,proto3" json:"fields,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+type Value struct {
+	// Types that are valid to be assigned to Kind:
+	//	*Value_Null
+	//	*Value_Array
+	//	*Value_Boolean
+	//	*Value_Float
+	//	*Value_Integer
+	//	*Value_Object
+	//	*Value_String_
+	//	*Value_Timestamp
+	//	*Value_UnsignedInteger
+	Kind                 isValue_Kind `protobuf_oneof:"kind"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
 }
 
-func (m *ValueMap) Reset()         { *m = ValueMap{} }
-func (m *ValueMap) String() string { return proto.CompactTextString(m) }
-func (*ValueMap) ProtoMessage()    {}
-func (*ValueMap) Descriptor() ([]byte, []int) {
+func (m *Value) Reset()         { *m = Value{} }
+func (m *Value) String() string { return proto.CompactTextString(m) }
+func (*Value) ProtoMessage()    {}
+func (*Value) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2d17a9d3f0ddf27e, []int{2}
 }
-func (m *ValueMap) XXX_Unmarshal(b []byte) error {
+func (m *Value) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ValueMap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Value) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ValueMap.Marshal(b, m, deterministic)
+		return xxx_messageInfo_Value.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -259,23 +209,145 @@ func (m *ValueMap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *ValueMap) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ValueMap.Merge(m, src)
+func (m *Value) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Value.Merge(m, src)
 }
-func (m *ValueMap) XXX_Size() int {
+func (m *Value) XXX_Size() int {
 	return m.Size()
 }
-func (m *ValueMap) XXX_DiscardUnknown() {
-	xxx_messageInfo_ValueMap.DiscardUnknown(m)
+func (m *Value) XXX_DiscardUnknown() {
+	xxx_messageInfo_Value.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ValueMap proto.InternalMessageInfo
+var xxx_messageInfo_Value proto.InternalMessageInfo
 
-func (m *ValueMap) GetFields() map[string]*Value {
+type isValue_Kind interface {
+	isValue_Kind()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type Value_Null struct {
+	Null ValueNull `protobuf:"varint,1,opt,name=null,proto3,enum=protobuf.ValueNull,oneof" json:"null,omitempty"`
+}
+type Value_Array struct {
+	Array *ValueArray `protobuf:"bytes,2,opt,name=array,proto3,oneof" json:"array,omitempty"`
+}
+type Value_Boolean struct {
+	Boolean bool `protobuf:"varint,3,opt,name=boolean,proto3,oneof" json:"boolean,omitempty"`
+}
+type Value_Float struct {
+	Float float64 `protobuf:"fixed64,4,opt,name=float,proto3,oneof" json:"float,omitempty"`
+}
+type Value_Integer struct {
+	Integer int64 `protobuf:"varint,5,opt,name=integer,proto3,oneof" json:"integer,omitempty"`
+}
+type Value_Object struct {
+	Object *ValueObject `protobuf:"bytes,6,opt,name=object,proto3,oneof" json:"object,omitempty"`
+}
+type Value_String_ struct {
+	String_ []byte `protobuf:"bytes,7,opt,name=string,proto3,oneof" json:"string,omitempty"`
+}
+type Value_Timestamp struct {
+	Timestamp int64 `protobuf:"varint,8,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
+}
+type Value_UnsignedInteger struct {
+	UnsignedInteger uint64 `protobuf:"varint,9,opt,name=unsigned_integer,json=unsignedInteger,proto3,oneof" json:"unsigned_integer,omitempty"`
+}
+
+func (*Value_Null) isValue_Kind()            {}
+func (*Value_Array) isValue_Kind()           {}
+func (*Value_Boolean) isValue_Kind()         {}
+func (*Value_Float) isValue_Kind()           {}
+func (*Value_Integer) isValue_Kind()         {}
+func (*Value_Object) isValue_Kind()          {}
+func (*Value_String_) isValue_Kind()         {}
+func (*Value_Timestamp) isValue_Kind()       {}
+func (*Value_UnsignedInteger) isValue_Kind() {}
+
+func (m *Value) GetKind() isValue_Kind {
 	if m != nil {
-		return m.Fields
+		return m.Kind
 	}
 	return nil
+}
+
+func (m *Value) GetNull() ValueNull {
+	if x, ok := m.GetKind().(*Value_Null); ok {
+		return x.Null
+	}
+	return ValueNull_NULL_VALUE
+}
+
+func (m *Value) GetArray() *ValueArray {
+	if x, ok := m.GetKind().(*Value_Array); ok {
+		return x.Array
+	}
+	return nil
+}
+
+func (m *Value) GetBoolean() bool {
+	if x, ok := m.GetKind().(*Value_Boolean); ok {
+		return x.Boolean
+	}
+	return false
+}
+
+func (m *Value) GetFloat() float64 {
+	if x, ok := m.GetKind().(*Value_Float); ok {
+		return x.Float
+	}
+	return 0
+}
+
+func (m *Value) GetInteger() int64 {
+	if x, ok := m.GetKind().(*Value_Integer); ok {
+		return x.Integer
+	}
+	return 0
+}
+
+func (m *Value) GetObject() *ValueObject {
+	if x, ok := m.GetKind().(*Value_Object); ok {
+		return x.Object
+	}
+	return nil
+}
+
+func (m *Value) GetString_() []byte {
+	if x, ok := m.GetKind().(*Value_String_); ok {
+		return x.String_
+	}
+	return nil
+}
+
+func (m *Value) GetTimestamp() int64 {
+	if x, ok := m.GetKind().(*Value_Timestamp); ok {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (m *Value) GetUnsignedInteger() uint64 {
+	if x, ok := m.GetKind().(*Value_UnsignedInteger); ok {
+		return x.UnsignedInteger
+	}
+	return 0
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Value) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*Value_Null)(nil),
+		(*Value_Array)(nil),
+		(*Value_Boolean)(nil),
+		(*Value_Float)(nil),
+		(*Value_Integer)(nil),
+		(*Value_Object)(nil),
+		(*Value_String_)(nil),
+		(*Value_Timestamp)(nil),
+		(*Value_UnsignedInteger)(nil),
+	}
 }
 
 type ValueArray struct {
@@ -325,34 +397,25 @@ func (m *ValueArray) GetItems() []*Value {
 	return nil
 }
 
-type Value struct {
-	// Types that are valid to be assigned to Kind:
-	//	*Value_RawBytes
-	//	*Value_Timestamp
-	//	*Value_Integer
-	//	*Value_Float
-	//	*Value_Boolean
-	//	*Value_Map
-	//	*Value_Array
-	//	*Value_Null
-	Kind                 isValue_Kind `protobuf_oneof:"kind"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
+type ValueObject struct {
+	Fields               map[string]*Value `protobuf:"bytes,1,rep,name=fields,proto3" json:"fields,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *Value) Reset()         { *m = Value{} }
-func (m *Value) String() string { return proto.CompactTextString(m) }
-func (*Value) ProtoMessage()    {}
-func (*Value) Descriptor() ([]byte, []int) {
+func (m *ValueObject) Reset()         { *m = ValueObject{} }
+func (m *ValueObject) String() string { return proto.CompactTextString(m) }
+func (*ValueObject) ProtoMessage()    {}
+func (*ValueObject) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2d17a9d3f0ddf27e, []int{4}
 }
-func (m *Value) XXX_Unmarshal(b []byte) error {
+func (m *ValueObject) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Value) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ValueObject) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Value.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ValueObject.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -362,1345 +425,71 @@ func (m *Value) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *Value) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Value.Merge(m, src)
+func (m *ValueObject) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ValueObject.Merge(m, src)
 }
-func (m *Value) XXX_Size() int {
+func (m *ValueObject) XXX_Size() int {
 	return m.Size()
 }
-func (m *Value) XXX_DiscardUnknown() {
-	xxx_messageInfo_Value.DiscardUnknown(m)
+func (m *ValueObject) XXX_DiscardUnknown() {
+	xxx_messageInfo_ValueObject.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Value proto.InternalMessageInfo
+var xxx_messageInfo_ValueObject proto.InternalMessageInfo
 
-type isValue_Kind interface {
-	isValue_Kind()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type Value_RawBytes struct {
-	RawBytes []byte `protobuf:"bytes,1,opt,name=raw_bytes,json=rawBytes,proto3,oneof" json:"raw_bytes,omitempty"`
-}
-type Value_Timestamp struct {
-	Timestamp *types.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
-}
-type Value_Integer struct {
-	Integer int64 `protobuf:"varint,4,opt,name=integer,proto3,oneof" json:"integer,omitempty"`
-}
-type Value_Float struct {
-	Float float64 `protobuf:"fixed64,5,opt,name=float,proto3,oneof" json:"float,omitempty"`
-}
-type Value_Boolean struct {
-	Boolean bool `protobuf:"varint,6,opt,name=boolean,proto3,oneof" json:"boolean,omitempty"`
-}
-type Value_Map struct {
-	Map *ValueMap `protobuf:"bytes,7,opt,name=map,proto3,oneof" json:"map,omitempty"`
-}
-type Value_Array struct {
-	Array *ValueArray `protobuf:"bytes,8,opt,name=array,proto3,oneof" json:"array,omitempty"`
-}
-type Value_Null struct {
-	Null ValueNull `protobuf:"varint,9,opt,name=null,proto3,enum=protobuf.ValueNull,oneof" json:"null,omitempty"`
-}
-
-func (*Value_RawBytes) isValue_Kind()  {}
-func (*Value_Timestamp) isValue_Kind() {}
-func (*Value_Integer) isValue_Kind()   {}
-func (*Value_Float) isValue_Kind()     {}
-func (*Value_Boolean) isValue_Kind()   {}
-func (*Value_Map) isValue_Kind()       {}
-func (*Value_Array) isValue_Kind()     {}
-func (*Value_Null) isValue_Kind()      {}
-
-func (m *Value) GetKind() isValue_Kind {
+func (m *ValueObject) GetFields() map[string]*Value {
 	if m != nil {
-		return m.Kind
-	}
-	return nil
-}
-
-func (m *Value) GetRawBytes() []byte {
-	if x, ok := m.GetKind().(*Value_RawBytes); ok {
-		return x.RawBytes
-	}
-	return nil
-}
-
-func (m *Value) GetTimestamp() *types.Timestamp {
-	if x, ok := m.GetKind().(*Value_Timestamp); ok {
-		return x.Timestamp
-	}
-	return nil
-}
-
-func (m *Value) GetInteger() int64 {
-	if x, ok := m.GetKind().(*Value_Integer); ok {
-		return x.Integer
-	}
-	return 0
-}
-
-func (m *Value) GetFloat() float64 {
-	if x, ok := m.GetKind().(*Value_Float); ok {
-		return x.Float
-	}
-	return 0
-}
-
-func (m *Value) GetBoolean() bool {
-	if x, ok := m.GetKind().(*Value_Boolean); ok {
-		return x.Boolean
-	}
-	return false
-}
-
-func (m *Value) GetMap() *ValueMap {
-	if x, ok := m.GetKind().(*Value_Map); ok {
-		return x.Map
-	}
-	return nil
-}
-
-func (m *Value) GetArray() *ValueArray {
-	if x, ok := m.GetKind().(*Value_Array); ok {
-		return x.Array
-	}
-	return nil
-}
-
-func (m *Value) GetNull() ValueNull {
-	if x, ok := m.GetKind().(*Value_Null); ok {
-		return x.Null
-	}
-	return ValueNull_NULL_VALUE
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*Value) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*Value_RawBytes)(nil),
-		(*Value_Timestamp)(nil),
-		(*Value_Integer)(nil),
-		(*Value_Float)(nil),
-		(*Value_Boolean)(nil),
-		(*Value_Map)(nil),
-		(*Value_Array)(nil),
-		(*Value_Null)(nil),
-	}
-}
-
-type Metric struct {
-	Name      string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Timestamp *types.Timestamp  `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Tags      map[string]string `protobuf:"bytes,3,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Kind      Metric_Kind       `protobuf:"varint,4,opt,name=kind,proto3,enum=protobuf.Metric_Kind" json:"kind,omitempty"`
-	// Types that are valid to be assigned to Value:
-	//	*Metric_Counter
-	//	*Metric_Gauge
-	//	*Metric_Set
-	//	*Metric_Distribution1
-	//	*Metric_AggregatedHistogram1
-	//	*Metric_AggregatedSummary1
-	//	*Metric_Distribution2
-	//	*Metric_AggregatedHistogram2
-	//	*Metric_AggregatedSummary2
-	//	*Metric_Sketch
-	Value                isMetric_Value `protobuf_oneof:"value"`
-	Namespace            string         `protobuf:"bytes,11,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_unrecognized     []byte         `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
-}
-
-func (m *Metric) Reset()         { *m = Metric{} }
-func (m *Metric) String() string { return proto.CompactTextString(m) }
-func (*Metric) ProtoMessage()    {}
-func (*Metric) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{5}
-}
-func (m *Metric) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Metric) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Metric.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Metric) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Metric.Merge(m, src)
-}
-func (m *Metric) XXX_Size() int {
-	return m.Size()
-}
-func (m *Metric) XXX_DiscardUnknown() {
-	xxx_messageInfo_Metric.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Metric proto.InternalMessageInfo
-
-type isMetric_Value interface {
-	isMetric_Value()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type Metric_Counter struct {
-	Counter *Counter `protobuf:"bytes,5,opt,name=counter,proto3,oneof" json:"counter,omitempty"`
-}
-type Metric_Gauge struct {
-	Gauge *Gauge `protobuf:"bytes,6,opt,name=gauge,proto3,oneof" json:"gauge,omitempty"`
-}
-type Metric_Set struct {
-	Set *Set `protobuf:"bytes,7,opt,name=set,proto3,oneof" json:"set,omitempty"`
-}
-type Metric_Distribution1 struct {
-	Distribution1 *Distribution1 `protobuf:"bytes,8,opt,name=distribution1,proto3,oneof" json:"distribution1,omitempty"`
-}
-type Metric_AggregatedHistogram1 struct {
-	AggregatedHistogram1 *AggregatedHistogram1 `protobuf:"bytes,9,opt,name=aggregated_histogram1,json=aggregatedHistogram1,proto3,oneof" json:"aggregated_histogram1,omitempty"`
-}
-type Metric_AggregatedSummary1 struct {
-	AggregatedSummary1 *AggregatedSummary1 `protobuf:"bytes,10,opt,name=aggregated_summary1,json=aggregatedSummary1,proto3,oneof" json:"aggregated_summary1,omitempty"`
-}
-type Metric_Distribution2 struct {
-	Distribution2 *Distribution2 `protobuf:"bytes,12,opt,name=distribution2,proto3,oneof" json:"distribution2,omitempty"`
-}
-type Metric_AggregatedHistogram2 struct {
-	AggregatedHistogram2 *AggregatedHistogram2 `protobuf:"bytes,13,opt,name=aggregated_histogram2,json=aggregatedHistogram2,proto3,oneof" json:"aggregated_histogram2,omitempty"`
-}
-type Metric_AggregatedSummary2 struct {
-	AggregatedSummary2 *AggregatedSummary2 `protobuf:"bytes,14,opt,name=aggregated_summary2,json=aggregatedSummary2,proto3,oneof" json:"aggregated_summary2,omitempty"`
-}
-type Metric_Sketch struct {
-	Sketch *Sketch `protobuf:"bytes,15,opt,name=sketch,proto3,oneof" json:"sketch,omitempty"`
-}
-
-func (*Metric_Counter) isMetric_Value()              {}
-func (*Metric_Gauge) isMetric_Value()                {}
-func (*Metric_Set) isMetric_Value()                  {}
-func (*Metric_Distribution1) isMetric_Value()        {}
-func (*Metric_AggregatedHistogram1) isMetric_Value() {}
-func (*Metric_AggregatedSummary1) isMetric_Value()   {}
-func (*Metric_Distribution2) isMetric_Value()        {}
-func (*Metric_AggregatedHistogram2) isMetric_Value() {}
-func (*Metric_AggregatedSummary2) isMetric_Value()   {}
-func (*Metric_Sketch) isMetric_Value()               {}
-
-func (m *Metric) GetValue() isMetric_Value {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-func (m *Metric) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *Metric) GetTimestamp() *types.Timestamp {
-	if m != nil {
-		return m.Timestamp
-	}
-	return nil
-}
-
-func (m *Metric) GetTags() map[string]string {
-	if m != nil {
-		return m.Tags
-	}
-	return nil
-}
-
-func (m *Metric) GetKind() Metric_Kind {
-	if m != nil {
-		return m.Kind
-	}
-	return Metric_Incremental
-}
-
-func (m *Metric) GetCounter() *Counter {
-	if x, ok := m.GetValue().(*Metric_Counter); ok {
-		return x.Counter
-	}
-	return nil
-}
-
-func (m *Metric) GetGauge() *Gauge {
-	if x, ok := m.GetValue().(*Metric_Gauge); ok {
-		return x.Gauge
-	}
-	return nil
-}
-
-func (m *Metric) GetSet() *Set {
-	if x, ok := m.GetValue().(*Metric_Set); ok {
-		return x.Set
-	}
-	return nil
-}
-
-func (m *Metric) GetDistribution1() *Distribution1 {
-	if x, ok := m.GetValue().(*Metric_Distribution1); ok {
-		return x.Distribution1
-	}
-	return nil
-}
-
-func (m *Metric) GetAggregatedHistogram1() *AggregatedHistogram1 {
-	if x, ok := m.GetValue().(*Metric_AggregatedHistogram1); ok {
-		return x.AggregatedHistogram1
-	}
-	return nil
-}
-
-func (m *Metric) GetAggregatedSummary1() *AggregatedSummary1 {
-	if x, ok := m.GetValue().(*Metric_AggregatedSummary1); ok {
-		return x.AggregatedSummary1
-	}
-	return nil
-}
-
-func (m *Metric) GetDistribution2() *Distribution2 {
-	if x, ok := m.GetValue().(*Metric_Distribution2); ok {
-		return x.Distribution2
-	}
-	return nil
-}
-
-func (m *Metric) GetAggregatedHistogram2() *AggregatedHistogram2 {
-	if x, ok := m.GetValue().(*Metric_AggregatedHistogram2); ok {
-		return x.AggregatedHistogram2
-	}
-	return nil
-}
-
-func (m *Metric) GetAggregatedSummary2() *AggregatedSummary2 {
-	if x, ok := m.GetValue().(*Metric_AggregatedSummary2); ok {
-		return x.AggregatedSummary2
-	}
-	return nil
-}
-
-func (m *Metric) GetSketch() *Sketch {
-	if x, ok := m.GetValue().(*Metric_Sketch); ok {
-		return x.Sketch
-	}
-	return nil
-}
-
-func (m *Metric) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*Metric) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*Metric_Counter)(nil),
-		(*Metric_Gauge)(nil),
-		(*Metric_Set)(nil),
-		(*Metric_Distribution1)(nil),
-		(*Metric_AggregatedHistogram1)(nil),
-		(*Metric_AggregatedSummary1)(nil),
-		(*Metric_Distribution2)(nil),
-		(*Metric_AggregatedHistogram2)(nil),
-		(*Metric_AggregatedSummary2)(nil),
-		(*Metric_Sketch)(nil),
-	}
-}
-
-type Counter struct {
-	Value                float64  `protobuf:"fixed64,1,opt,name=value,proto3" json:"value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Counter) Reset()         { *m = Counter{} }
-func (m *Counter) String() string { return proto.CompactTextString(m) }
-func (*Counter) ProtoMessage()    {}
-func (*Counter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{6}
-}
-func (m *Counter) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Counter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Counter.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Counter) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Counter.Merge(m, src)
-}
-func (m *Counter) XXX_Size() int {
-	return m.Size()
-}
-func (m *Counter) XXX_DiscardUnknown() {
-	xxx_messageInfo_Counter.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Counter proto.InternalMessageInfo
-
-func (m *Counter) GetValue() float64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
-type Gauge struct {
-	Value                float64  `protobuf:"fixed64,1,opt,name=value,proto3" json:"value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Gauge) Reset()         { *m = Gauge{} }
-func (m *Gauge) String() string { return proto.CompactTextString(m) }
-func (*Gauge) ProtoMessage()    {}
-func (*Gauge) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{7}
-}
-func (m *Gauge) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Gauge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Gauge.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Gauge) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Gauge.Merge(m, src)
-}
-func (m *Gauge) XXX_Size() int {
-	return m.Size()
-}
-func (m *Gauge) XXX_DiscardUnknown() {
-	xxx_messageInfo_Gauge.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Gauge proto.InternalMessageInfo
-
-func (m *Gauge) GetValue() float64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
-type Set struct {
-	Values               []string `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Set) Reset()         { *m = Set{} }
-func (m *Set) String() string { return proto.CompactTextString(m) }
-func (*Set) ProtoMessage()    {}
-func (*Set) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{8}
-}
-func (m *Set) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Set) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Set.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Set) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Set.Merge(m, src)
-}
-func (m *Set) XXX_Size() int {
-	return m.Size()
-}
-func (m *Set) XXX_DiscardUnknown() {
-	xxx_messageInfo_Set.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Set proto.InternalMessageInfo
-
-func (m *Set) GetValues() []string {
-	if m != nil {
-		return m.Values
-	}
-	return nil
-}
-
-type Distribution1 struct {
-	Values               []float64     `protobuf:"fixed64,1,rep,packed,name=values,proto3" json:"values,omitempty"`
-	SampleRates          []uint32      `protobuf:"varint,2,rep,packed,name=sample_rates,json=sampleRates,proto3" json:"sample_rates,omitempty"`
-	Statistic            StatisticKind `protobuf:"varint,3,opt,name=statistic,proto3,enum=protobuf.StatisticKind" json:"statistic,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
-}
-
-func (m *Distribution1) Reset()         { *m = Distribution1{} }
-func (m *Distribution1) String() string { return proto.CompactTextString(m) }
-func (*Distribution1) ProtoMessage()    {}
-func (*Distribution1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{9}
-}
-func (m *Distribution1) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Distribution1) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Distribution1.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Distribution1) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Distribution1.Merge(m, src)
-}
-func (m *Distribution1) XXX_Size() int {
-	return m.Size()
-}
-func (m *Distribution1) XXX_DiscardUnknown() {
-	xxx_messageInfo_Distribution1.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Distribution1 proto.InternalMessageInfo
-
-func (m *Distribution1) GetValues() []float64 {
-	if m != nil {
-		return m.Values
-	}
-	return nil
-}
-
-func (m *Distribution1) GetSampleRates() []uint32 {
-	if m != nil {
-		return m.SampleRates
-	}
-	return nil
-}
-
-func (m *Distribution1) GetStatistic() StatisticKind {
-	if m != nil {
-		return m.Statistic
-	}
-	return StatisticKind_Histogram
-}
-
-type Distribution2 struct {
-	Samples              []*DistributionSample `protobuf:"bytes,1,rep,name=samples,proto3" json:"samples,omitempty"`
-	Statistic            StatisticKind         `protobuf:"varint,2,opt,name=statistic,proto3,enum=protobuf.StatisticKind" json:"statistic,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
-}
-
-func (m *Distribution2) Reset()         { *m = Distribution2{} }
-func (m *Distribution2) String() string { return proto.CompactTextString(m) }
-func (*Distribution2) ProtoMessage()    {}
-func (*Distribution2) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{10}
-}
-func (m *Distribution2) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Distribution2) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Distribution2.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Distribution2) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Distribution2.Merge(m, src)
-}
-func (m *Distribution2) XXX_Size() int {
-	return m.Size()
-}
-func (m *Distribution2) XXX_DiscardUnknown() {
-	xxx_messageInfo_Distribution2.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Distribution2 proto.InternalMessageInfo
-
-func (m *Distribution2) GetSamples() []*DistributionSample {
-	if m != nil {
-		return m.Samples
-	}
-	return nil
-}
-
-func (m *Distribution2) GetStatistic() StatisticKind {
-	if m != nil {
-		return m.Statistic
-	}
-	return StatisticKind_Histogram
-}
-
-type DistributionSample struct {
-	Value                float64  `protobuf:"fixed64,1,opt,name=value,proto3" json:"value,omitempty"`
-	Rate                 uint32   `protobuf:"varint,2,opt,name=rate,proto3" json:"rate,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *DistributionSample) Reset()         { *m = DistributionSample{} }
-func (m *DistributionSample) String() string { return proto.CompactTextString(m) }
-func (*DistributionSample) ProtoMessage()    {}
-func (*DistributionSample) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{11}
-}
-func (m *DistributionSample) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *DistributionSample) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_DistributionSample.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *DistributionSample) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DistributionSample.Merge(m, src)
-}
-func (m *DistributionSample) XXX_Size() int {
-	return m.Size()
-}
-func (m *DistributionSample) XXX_DiscardUnknown() {
-	xxx_messageInfo_DistributionSample.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DistributionSample proto.InternalMessageInfo
-
-func (m *DistributionSample) GetValue() float64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
-func (m *DistributionSample) GetRate() uint32 {
-	if m != nil {
-		return m.Rate
-	}
-	return 0
-}
-
-type AggregatedHistogram1 struct {
-	Buckets              []float64 `protobuf:"fixed64,1,rep,packed,name=buckets,proto3" json:"buckets,omitempty"`
-	Counts               []uint32  `protobuf:"varint,2,rep,packed,name=counts,proto3" json:"counts,omitempty"`
-	Count                uint32    `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
-	Sum                  float64   `protobuf:"fixed64,4,opt,name=sum,proto3" json:"sum,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
-}
-
-func (m *AggregatedHistogram1) Reset()         { *m = AggregatedHistogram1{} }
-func (m *AggregatedHistogram1) String() string { return proto.CompactTextString(m) }
-func (*AggregatedHistogram1) ProtoMessage()    {}
-func (*AggregatedHistogram1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{12}
-}
-func (m *AggregatedHistogram1) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *AggregatedHistogram1) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AggregatedHistogram1.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *AggregatedHistogram1) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AggregatedHistogram1.Merge(m, src)
-}
-func (m *AggregatedHistogram1) XXX_Size() int {
-	return m.Size()
-}
-func (m *AggregatedHistogram1) XXX_DiscardUnknown() {
-	xxx_messageInfo_AggregatedHistogram1.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AggregatedHistogram1 proto.InternalMessageInfo
-
-func (m *AggregatedHistogram1) GetBuckets() []float64 {
-	if m != nil {
-		return m.Buckets
-	}
-	return nil
-}
-
-func (m *AggregatedHistogram1) GetCounts() []uint32 {
-	if m != nil {
-		return m.Counts
-	}
-	return nil
-}
-
-func (m *AggregatedHistogram1) GetCount() uint32 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
-func (m *AggregatedHistogram1) GetSum() float64 {
-	if m != nil {
-		return m.Sum
-	}
-	return 0
-}
-
-type AggregatedHistogram2 struct {
-	Buckets              []*HistogramBucket `protobuf:"bytes,1,rep,name=buckets,proto3" json:"buckets,omitempty"`
-	Count                uint32             `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	Sum                  float64            `protobuf:"fixed64,3,opt,name=sum,proto3" json:"sum,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
-}
-
-func (m *AggregatedHistogram2) Reset()         { *m = AggregatedHistogram2{} }
-func (m *AggregatedHistogram2) String() string { return proto.CompactTextString(m) }
-func (*AggregatedHistogram2) ProtoMessage()    {}
-func (*AggregatedHistogram2) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{13}
-}
-func (m *AggregatedHistogram2) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *AggregatedHistogram2) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AggregatedHistogram2.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *AggregatedHistogram2) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AggregatedHistogram2.Merge(m, src)
-}
-func (m *AggregatedHistogram2) XXX_Size() int {
-	return m.Size()
-}
-func (m *AggregatedHistogram2) XXX_DiscardUnknown() {
-	xxx_messageInfo_AggregatedHistogram2.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AggregatedHistogram2 proto.InternalMessageInfo
-
-func (m *AggregatedHistogram2) GetBuckets() []*HistogramBucket {
-	if m != nil {
-		return m.Buckets
-	}
-	return nil
-}
-
-func (m *AggregatedHistogram2) GetCount() uint32 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
-func (m *AggregatedHistogram2) GetSum() float64 {
-	if m != nil {
-		return m.Sum
-	}
-	return 0
-}
-
-type HistogramBucket struct {
-	UpperLimit           float64  `protobuf:"fixed64,1,opt,name=upper_limit,json=upperLimit,proto3" json:"upper_limit,omitempty"`
-	Count                uint32   `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *HistogramBucket) Reset()         { *m = HistogramBucket{} }
-func (m *HistogramBucket) String() string { return proto.CompactTextString(m) }
-func (*HistogramBucket) ProtoMessage()    {}
-func (*HistogramBucket) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{14}
-}
-func (m *HistogramBucket) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *HistogramBucket) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_HistogramBucket.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *HistogramBucket) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HistogramBucket.Merge(m, src)
-}
-func (m *HistogramBucket) XXX_Size() int {
-	return m.Size()
-}
-func (m *HistogramBucket) XXX_DiscardUnknown() {
-	xxx_messageInfo_HistogramBucket.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_HistogramBucket proto.InternalMessageInfo
-
-func (m *HistogramBucket) GetUpperLimit() float64 {
-	if m != nil {
-		return m.UpperLimit
-	}
-	return 0
-}
-
-func (m *HistogramBucket) GetCount() uint32 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
-type AggregatedSummary1 struct {
-	Quantiles            []float64 `protobuf:"fixed64,1,rep,packed,name=quantiles,proto3" json:"quantiles,omitempty"`
-	Values               []float64 `protobuf:"fixed64,2,rep,packed,name=values,proto3" json:"values,omitempty"`
-	Count                uint32    `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
-	Sum                  float64   `protobuf:"fixed64,4,opt,name=sum,proto3" json:"sum,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
-}
-
-func (m *AggregatedSummary1) Reset()         { *m = AggregatedSummary1{} }
-func (m *AggregatedSummary1) String() string { return proto.CompactTextString(m) }
-func (*AggregatedSummary1) ProtoMessage()    {}
-func (*AggregatedSummary1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{15}
-}
-func (m *AggregatedSummary1) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *AggregatedSummary1) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AggregatedSummary1.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *AggregatedSummary1) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AggregatedSummary1.Merge(m, src)
-}
-func (m *AggregatedSummary1) XXX_Size() int {
-	return m.Size()
-}
-func (m *AggregatedSummary1) XXX_DiscardUnknown() {
-	xxx_messageInfo_AggregatedSummary1.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AggregatedSummary1 proto.InternalMessageInfo
-
-func (m *AggregatedSummary1) GetQuantiles() []float64 {
-	if m != nil {
-		return m.Quantiles
-	}
-	return nil
-}
-
-func (m *AggregatedSummary1) GetValues() []float64 {
-	if m != nil {
-		return m.Values
-	}
-	return nil
-}
-
-func (m *AggregatedSummary1) GetCount() uint32 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
-func (m *AggregatedSummary1) GetSum() float64 {
-	if m != nil {
-		return m.Sum
-	}
-	return 0
-}
-
-type AggregatedSummary2 struct {
-	Quantiles            []*SummaryQuantile `protobuf:"bytes,1,rep,name=quantiles,proto3" json:"quantiles,omitempty"`
-	Count                uint32             `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	Sum                  float64            `protobuf:"fixed64,3,opt,name=sum,proto3" json:"sum,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
-}
-
-func (m *AggregatedSummary2) Reset()         { *m = AggregatedSummary2{} }
-func (m *AggregatedSummary2) String() string { return proto.CompactTextString(m) }
-func (*AggregatedSummary2) ProtoMessage()    {}
-func (*AggregatedSummary2) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{16}
-}
-func (m *AggregatedSummary2) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *AggregatedSummary2) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AggregatedSummary2.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *AggregatedSummary2) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AggregatedSummary2.Merge(m, src)
-}
-func (m *AggregatedSummary2) XXX_Size() int {
-	return m.Size()
-}
-func (m *AggregatedSummary2) XXX_DiscardUnknown() {
-	xxx_messageInfo_AggregatedSummary2.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AggregatedSummary2 proto.InternalMessageInfo
-
-func (m *AggregatedSummary2) GetQuantiles() []*SummaryQuantile {
-	if m != nil {
-		return m.Quantiles
-	}
-	return nil
-}
-
-func (m *AggregatedSummary2) GetCount() uint32 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
-func (m *AggregatedSummary2) GetSum() float64 {
-	if m != nil {
-		return m.Sum
-	}
-	return 0
-}
-
-type SummaryQuantile struct {
-	Quantile             float64  `protobuf:"fixed64,1,opt,name=quantile,proto3" json:"quantile,omitempty"`
-	Value                float64  `protobuf:"fixed64,2,opt,name=value,proto3" json:"value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *SummaryQuantile) Reset()         { *m = SummaryQuantile{} }
-func (m *SummaryQuantile) String() string { return proto.CompactTextString(m) }
-func (*SummaryQuantile) ProtoMessage()    {}
-func (*SummaryQuantile) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{17}
-}
-func (m *SummaryQuantile) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SummaryQuantile) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SummaryQuantile.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *SummaryQuantile) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SummaryQuantile.Merge(m, src)
-}
-func (m *SummaryQuantile) XXX_Size() int {
-	return m.Size()
-}
-func (m *SummaryQuantile) XXX_DiscardUnknown() {
-	xxx_messageInfo_SummaryQuantile.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SummaryQuantile proto.InternalMessageInfo
-
-func (m *SummaryQuantile) GetQuantile() float64 {
-	if m != nil {
-		return m.Quantile
-	}
-	return 0
-}
-
-func (m *SummaryQuantile) GetValue() float64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
-type Sketch struct {
-	// Types that are valid to be assigned to Sketch:
-	//	*Sketch_AgentDdSketch
-	Sketch               isSketch_Sketch `protobuf_oneof:"sketch"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
-}
-
-func (m *Sketch) Reset()         { *m = Sketch{} }
-func (m *Sketch) String() string { return proto.CompactTextString(m) }
-func (*Sketch) ProtoMessage()    {}
-func (*Sketch) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{18}
-}
-func (m *Sketch) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Sketch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Sketch.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Sketch) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Sketch.Merge(m, src)
-}
-func (m *Sketch) XXX_Size() int {
-	return m.Size()
-}
-func (m *Sketch) XXX_DiscardUnknown() {
-	xxx_messageInfo_Sketch.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Sketch proto.InternalMessageInfo
-
-type isSketch_Sketch interface {
-	isSketch_Sketch()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type Sketch_AgentDdSketch struct {
-	AgentDdSketch *Sketch_AgentDDSketch `protobuf:"bytes,1,opt,name=agent_dd_sketch,json=agentDdSketch,proto3,oneof" json:"agent_dd_sketch,omitempty"`
-}
-
-func (*Sketch_AgentDdSketch) isSketch_Sketch() {}
-
-func (m *Sketch) GetSketch() isSketch_Sketch {
-	if m != nil {
-		return m.Sketch
-	}
-	return nil
-}
-
-func (m *Sketch) GetAgentDdSketch() *Sketch_AgentDDSketch {
-	if x, ok := m.GetSketch().(*Sketch_AgentDdSketch); ok {
-		return x.AgentDdSketch
-	}
-	return nil
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*Sketch) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*Sketch_AgentDdSketch)(nil),
-	}
-}
-
-type Sketch_AgentDDSketch struct {
-	// Summary statistics for the samples in this sketch.
-	Count uint32  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
-	Min   float64 `protobuf:"fixed64,2,opt,name=min,proto3" json:"min,omitempty"`
-	Max   float64 `protobuf:"fixed64,3,opt,name=max,proto3" json:"max,omitempty"`
-	Sum   float64 `protobuf:"fixed64,4,opt,name=sum,proto3" json:"sum,omitempty"`
-	Avg   float64 `protobuf:"fixed64,5,opt,name=avg,proto3" json:"avg,omitempty"`
-	// The bins (buckets) of this sketch, where `k` and `n` are unzipped pairs.
-	// `k` is the list of bin indexes that are populated, and `n` is the count of samples
-	// within the given bin.
-	K                    []int32  `protobuf:"zigzag32,6,rep,packed,name=k,proto3" json:"k,omitempty"`
-	N                    []uint32 `protobuf:"varint,7,rep,packed,name=n,proto3" json:"n,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Sketch_AgentDDSketch) Reset()         { *m = Sketch_AgentDDSketch{} }
-func (m *Sketch_AgentDDSketch) String() string { return proto.CompactTextString(m) }
-func (*Sketch_AgentDDSketch) ProtoMessage()    {}
-func (*Sketch_AgentDDSketch) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2d17a9d3f0ddf27e, []int{18, 0}
-}
-func (m *Sketch_AgentDDSketch) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Sketch_AgentDDSketch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Sketch_AgentDDSketch.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Sketch_AgentDDSketch) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Sketch_AgentDDSketch.Merge(m, src)
-}
-func (m *Sketch_AgentDDSketch) XXX_Size() int {
-	return m.Size()
-}
-func (m *Sketch_AgentDDSketch) XXX_DiscardUnknown() {
-	xxx_messageInfo_Sketch_AgentDDSketch.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Sketch_AgentDDSketch proto.InternalMessageInfo
-
-func (m *Sketch_AgentDDSketch) GetCount() uint32 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
-func (m *Sketch_AgentDDSketch) GetMin() float64 {
-	if m != nil {
-		return m.Min
-	}
-	return 0
-}
-
-func (m *Sketch_AgentDDSketch) GetMax() float64 {
-	if m != nil {
-		return m.Max
-	}
-	return 0
-}
-
-func (m *Sketch_AgentDDSketch) GetSum() float64 {
-	if m != nil {
-		return m.Sum
-	}
-	return 0
-}
-
-func (m *Sketch_AgentDDSketch) GetAvg() float64 {
-	if m != nil {
-		return m.Avg
-	}
-	return 0
-}
-
-func (m *Sketch_AgentDDSketch) GetK() []int32 {
-	if m != nil {
-		return m.K
-	}
-	return nil
-}
-
-func (m *Sketch_AgentDDSketch) GetN() []uint32 {
-	if m != nil {
-		return m.N
+		return m.Fields
 	}
 	return nil
 }
 
 func init() {
 	proto.RegisterEnum("protobuf.ValueNull", ValueNull_name, ValueNull_value)
-	proto.RegisterEnum("protobuf.StatisticKind", StatisticKind_name, StatisticKind_value)
-	proto.RegisterEnum("protobuf.Metric_Kind", Metric_Kind_name, Metric_Kind_value)
-	proto.RegisterType((*EventWrapper)(nil), "protobuf.EventWrapper")
+	proto.RegisterType((*MessageWrapper)(nil), "protobuf.MessageWrapper")
 	proto.RegisterType((*Log)(nil), "protobuf.Log")
-	proto.RegisterMapType((map[string]*Value)(nil), "protobuf.Log.FieldsEntry")
-	proto.RegisterType((*ValueMap)(nil), "protobuf.ValueMap")
-	proto.RegisterMapType((map[string]*Value)(nil), "protobuf.ValueMap.FieldsEntry")
-	proto.RegisterType((*ValueArray)(nil), "protobuf.ValueArray")
 	proto.RegisterType((*Value)(nil), "protobuf.Value")
-	proto.RegisterType((*Metric)(nil), "protobuf.Metric")
-	proto.RegisterMapType((map[string]string)(nil), "protobuf.Metric.TagsEntry")
-	proto.RegisterType((*Counter)(nil), "protobuf.Counter")
-	proto.RegisterType((*Gauge)(nil), "protobuf.Gauge")
-	proto.RegisterType((*Set)(nil), "protobuf.Set")
-	proto.RegisterType((*Distribution1)(nil), "protobuf.Distribution1")
-	proto.RegisterType((*Distribution2)(nil), "protobuf.Distribution2")
-	proto.RegisterType((*DistributionSample)(nil), "protobuf.DistributionSample")
-	proto.RegisterType((*AggregatedHistogram1)(nil), "protobuf.AggregatedHistogram1")
-	proto.RegisterType((*AggregatedHistogram2)(nil), "protobuf.AggregatedHistogram2")
-	proto.RegisterType((*HistogramBucket)(nil), "protobuf.HistogramBucket")
-	proto.RegisterType((*AggregatedSummary1)(nil), "protobuf.AggregatedSummary1")
-	proto.RegisterType((*AggregatedSummary2)(nil), "protobuf.AggregatedSummary2")
-	proto.RegisterType((*SummaryQuantile)(nil), "protobuf.SummaryQuantile")
-	proto.RegisterType((*Sketch)(nil), "protobuf.Sketch")
-	proto.RegisterType((*Sketch_AgentDDSketch)(nil), "protobuf.Sketch.AgentDDSketch")
+	proto.RegisterType((*ValueArray)(nil), "protobuf.ValueArray")
+	proto.RegisterType((*ValueObject)(nil), "protobuf.ValueObject")
+	proto.RegisterMapType((map[string]*Value)(nil), "protobuf.ValueObject.FieldsEntry")
 }
 
 func init() { proto.RegisterFile("event.proto", fileDescriptor_2d17a9d3f0ddf27e) }
 
 var fileDescriptor_2d17a9d3f0ddf27e = []byte{
-	// 1214 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0xcb, 0x92, 0xdb, 0x44,
-	0x14, 0x55, 0x5b, 0x7e, 0x5e, 0xdb, 0x63, 0xa7, 0x33, 0x09, 0xc2, 0x24, 0x13, 0x47, 0x55, 0x01,
-	0x13, 0xc0, 0xa9, 0x51, 0x8a, 0x24, 0x95, 0x05, 0xd4, 0x38, 0x13, 0x10, 0xc1, 0x09, 0x85, 0x9c,
-	0x84, 0xa5, 0xab, 0x6d, 0xf7, 0x28, 0x2a, 0xeb, 0x61, 0xa4, 0x56, 0x92, 0xd9, 0x50, 0x45, 0x15,
-	0x1b, 0x36, 0xac, 0xf9, 0x0d, 0x3e, 0x81, 0x1d, 0x4b, 0x3e, 0x81, 0x0a, 0x1b, 0x3e, 0x83, 0xea,
-	0xd6, 0xcb, 0x92, 0x35, 0x30, 0x2c, 0x58, 0xb9, 0xfb, 0xf4, 0xe9, 0xfb, 0x38, 0x7d, 0xef, 0xb5,
-	0xa0, 0x4d, 0x5f, 0x52, 0x97, 0x8d, 0x37, 0xbe, 0xc7, 0x3c, 0xdc, 0x14, 0x3f, 0x8b, 0xf0, 0x64,
-	0x70, 0xcd, 0xf4, 0x3c, 0xd3, 0xa6, 0xb7, 0x12, 0xe0, 0x16, 0xb3, 0x1c, 0x1a, 0x30, 0xe2, 0x6c,
-	0x22, 0xaa, 0x7a, 0x02, 0x9d, 0x87, 0xfc, 0xe6, 0x37, 0x3e, 0xd9, 0x6c, 0xa8, 0x8f, 0xaf, 0x83,
-	0x6c, 0x7b, 0xa6, 0x82, 0x86, 0x68, 0xd4, 0xd6, 0xba, 0xe3, 0xe4, 0xde, 0x78, 0xea, 0x99, 0xba,
-	0x64, 0xf0, 0x33, 0x7c, 0x13, 0xea, 0x0e, 0x65, 0xbe, 0xb5, 0x54, 0x2a, 0x82, 0xd5, 0xcf, 0x58,
-	0x8f, 0x05, 0xae, 0x4b, 0x46, 0xcc, 0x98, 0x34, 0xa0, 0x26, 0x02, 0x53, 0x7f, 0x40, 0x20, 0x4f,
-	0x3d, 0x13, 0x1f, 0x42, 0xfd, 0xc4, 0xa2, 0xf6, 0x2a, 0x50, 0xd0, 0x50, 0x1e, 0xb5, 0xb5, 0xb7,
-	0x73, 0x2e, 0xc6, 0x9f, 0x89, 0xb3, 0x87, 0x2e, 0xf3, 0x4f, 0x8d, 0x98, 0x38, 0x78, 0x04, 0xed,
-	0x2d, 0x18, 0xf7, 0x41, 0x5e, 0xd3, 0x53, 0x11, 0x61, 0xcb, 0xe0, 0x4b, 0x7c, 0x03, 0x6a, 0x2f,
-	0x89, 0x1d, 0xd2, 0x38, 0x9e, 0x5e, 0x66, 0xf2, 0x39, 0x87, 0x8d, 0xe8, 0xf4, 0x7e, 0xe5, 0x1e,
-	0x52, 0x7f, 0x42, 0xd0, 0x14, 0xe0, 0x63, 0xb2, 0xc1, 0x77, 0x0a, 0xb1, 0x1c, 0x14, 0x2e, 0x3e,
-	0x26, 0x9b, 0xff, 0x3d, 0xa0, 0xdb, 0x00, 0x02, 0x3b, 0xf2, 0x7d, 0x22, 0x2e, 0x5a, 0x8c, 0x3a,
-	0x49, 0x40, 0xbb, 0x17, 0xc5, 0xa9, 0xfa, 0x6b, 0x05, 0x6a, 0x02, 0xc0, 0x57, 0xa1, 0xe5, 0x93,
-	0x57, 0xf3, 0xc5, 0x29, 0xa3, 0x81, 0x88, 0xa0, 0xa3, 0x4b, 0x46, 0xd3, 0x27, 0xaf, 0x26, 0x1c,
-	0xc1, 0xf7, 0xa1, 0x95, 0x3e, 0x78, 0x1c, 0xcc, 0x60, 0x1c, 0x95, 0x44, 0x66, 0xfa, 0x69, 0xc2,
-	0xd0, 0x25, 0x23, 0xa3, 0xe3, 0x01, 0x34, 0x2c, 0x97, 0x51, 0x93, 0xfa, 0x4a, 0x75, 0x88, 0x46,
-	0xb2, 0x2e, 0x19, 0x09, 0x80, 0x2f, 0x43, 0xed, 0xc4, 0xf6, 0x08, 0x53, 0x6a, 0x43, 0x34, 0x42,
-	0xba, 0x64, 0x44, 0x5b, 0x7e, 0x67, 0xe1, 0x79, 0x36, 0x25, 0xae, 0x52, 0x1f, 0xa2, 0x51, 0x93,
-	0xdf, 0x89, 0x01, 0xfc, 0x2e, 0xc8, 0x0e, 0xd9, 0x28, 0x0d, 0x11, 0x05, 0xde, 0x95, 0x9a, 0x97,
-	0x97, 0x43, 0x36, 0xf8, 0x43, 0xa8, 0x11, 0x2e, 0x86, 0xd2, 0x14, 0xcc, 0xfd, 0x02, 0x53, 0x08,
-	0xc5, 0x3d, 0x0a, 0x12, 0x7e, 0x1f, 0xaa, 0x6e, 0x68, 0xdb, 0x4a, 0x6b, 0x88, 0x46, 0x7b, 0xda,
-	0xc5, 0x02, 0xf9, 0x49, 0x68, 0xdb, 0xba, 0x64, 0x08, 0xca, 0xa4, 0x0e, 0xd5, 0xb5, 0xe5, 0xae,
-	0x1e, 0x55, 0x9b, 0x72, 0xbf, 0xaa, 0xfe, 0xd2, 0x80, 0x7a, 0x54, 0xae, 0x18, 0x43, 0xd5, 0x25,
-	0x0e, 0x8d, 0x5f, 0x50, 0xac, 0xf1, 0xbd, 0xff, 0xa4, 0xdc, 0xb6, 0x6e, 0x63, 0xa8, 0x32, 0x62,
-	0x06, 0x8a, 0x2c, 0x9e, 0x70, 0x50, 0x6c, 0x8e, 0xf1, 0x53, 0x62, 0xc6, 0xf5, 0x24, 0x78, 0x3c,
-	0x03, 0x1e, 0x96, 0x10, 0x79, 0x4f, 0xbb, 0xb4, 0xc3, 0xff, 0xd2, 0x72, 0x57, 0x86, 0xa0, 0xe0,
-	0x8f, 0xa0, 0xb1, 0xf4, 0x42, 0x97, 0x51, 0x5f, 0x08, 0xdf, 0xd6, 0x2e, 0x64, 0xec, 0x07, 0xd1,
-	0x01, 0x57, 0x3c, 0xe6, 0xe0, 0xf7, 0xa0, 0x66, 0x92, 0xd0, 0xa4, 0xe2, 0x2d, 0x72, 0xd5, 0xf4,
-	0x39, 0x87, 0xb9, 0x88, 0xe2, 0x9c, 0x37, 0x7d, 0x40, 0x59, 0xfc, 0x34, 0x5b, 0x4d, 0x3f, 0xa3,
-	0x8c, 0xbf, 0x4a, 0x40, 0x19, 0xfe, 0x14, 0xba, 0x2b, 0x2b, 0x60, 0xbe, 0xb5, 0x08, 0x99, 0xe5,
-	0xb9, 0x87, 0xf1, 0xeb, 0xbc, 0x95, 0x91, 0x8f, 0xb7, 0x8f, 0x75, 0xc9, 0xc8, 0xf3, 0xf1, 0x33,
-	0xb8, 0x44, 0x4c, 0xd3, 0xa7, 0x26, 0x61, 0x74, 0x35, 0x7f, 0x61, 0x05, 0xcc, 0x33, 0x7d, 0xe2,
-	0x1c, 0x8a, 0x97, 0xcb, 0xf5, 0xde, 0x51, 0x4a, 0xd3, 0x53, 0x96, 0x2e, 0x19, 0xfb, 0xa4, 0x04,
-	0xc7, 0x5f, 0xc1, 0xc5, 0x2d, 0xb3, 0x41, 0xe8, 0x38, 0xc4, 0x3f, 0x3d, 0x54, 0x40, 0x18, 0xbd,
-	0x52, 0x66, 0x74, 0x16, 0x73, 0x74, 0xc9, 0xc0, 0x64, 0x07, 0x2d, 0x26, 0xaa, 0x29, 0x9d, 0x7f,
-	0x4a, 0x54, 0x2b, 0x26, 0xaa, 0x9d, 0x95, 0xa8, 0xa6, 0x74, 0xcf, 0x91, 0xa8, 0x76, 0x46, 0xa2,
-	0x5a, 0x79, 0xa2, 0x9a, 0xb2, 0xf7, 0xaf, 0x89, 0x6a, 0xa5, 0x89, 0x6a, 0x7c, 0x8c, 0x07, 0x6b,
-	0xca, 0x96, 0x2f, 0x94, 0x5e, 0x71, 0x8c, 0xcf, 0x04, 0xce, 0xc7, 0x78, 0xc4, 0xc0, 0x57, 0xa0,
-	0xc5, 0xbb, 0x22, 0xd8, 0x90, 0x25, 0x55, 0xda, 0xa2, 0x4d, 0x32, 0x60, 0x70, 0x17, 0x5a, 0x69,
-	0x51, 0x97, 0x4c, 0xc3, 0xfd, 0xed, 0x69, 0xd8, 0xda, 0x1e, 0x7e, 0x37, 0xa0, 0xca, 0xab, 0x1b,
-	0xf7, 0xa0, 0xfd, 0x85, 0xbb, 0xf4, 0xa9, 0x43, 0x5d, 0x46, 0xec, 0xbe, 0x84, 0x3b, 0xd0, 0x3c,
-	0x5a, 0x04, 0x9e, 0x1d, 0x32, 0xda, 0x47, 0xfc, 0x4f, 0x44, 0xdc, 0x51, 0xaf, 0x41, 0x23, 0x2e,
-	0xf3, 0xcc, 0x28, 0x77, 0x84, 0x62, 0xa3, 0xea, 0x55, 0xa8, 0x89, 0xd2, 0x3e, 0xf3, 0x58, 0x9e,
-	0x51, 0x86, 0x2f, 0x43, 0x5d, 0xec, 0xa3, 0x31, 0xdb, 0x32, 0xe2, 0x9d, 0xfa, 0x3d, 0x82, 0x6e,
-	0xae, 0x8a, 0x0b, 0x4c, 0x94, 0x30, 0xf1, 0x75, 0xe8, 0x04, 0xc4, 0xd9, 0xd8, 0x74, 0xee, 0x13,
-	0x3e, 0x79, 0x2b, 0x43, 0x79, 0xd4, 0x35, 0xda, 0x11, 0x66, 0x70, 0x08, 0x7f, 0x0c, 0xad, 0x80,
-	0x11, 0x66, 0x05, 0xcc, 0x5a, 0x2a, 0xb2, 0xe8, 0xed, 0xad, 0x1a, 0x9a, 0x25, 0x47, 0xa2, 0xbb,
-	0x33, 0xa6, 0xfa, 0x5d, 0x3e, 0x04, 0x0d, 0xdf, 0x81, 0x46, 0x64, 0x36, 0xf9, 0x53, 0xb8, 0x52,
-	0x5e, 0x89, 0xb3, 0xc8, 0x77, 0x42, 0xce, 0xfb, 0xaf, 0x9c, 0xdb, 0xff, 0x27, 0x80, 0x77, 0xad,
-	0x96, 0xcb, 0xc9, 0xe7, 0x26, 0x4f, 0x5f, 0x58, 0xef, 0x1a, 0x62, 0xad, 0x6e, 0x60, 0xbf, 0xac,
-	0x7f, 0xb1, 0x02, 0x8d, 0x45, 0xb8, 0x5c, 0x53, 0x96, 0x48, 0x99, 0x6c, 0xb9, 0xc6, 0x62, 0x60,
-	0x25, 0x2a, 0xc6, 0x3b, 0xee, 0x53, 0xac, 0x84, 0x78, 0x5d, 0x23, 0xda, 0xf0, 0xf2, 0x0a, 0x42,
-	0x47, 0x0c, 0x4b, 0x64, 0xf0, 0xa5, 0x1a, 0x94, 0x7a, 0xd4, 0xf0, 0xed, 0xbc, 0xc7, 0xdc, 0xa7,
-	0x46, 0x4a, 0x9b, 0x08, 0x46, 0x16, 0x4c, 0xea, 0xb4, 0x52, 0xe2, 0x54, 0xce, 0x9c, 0xea, 0xd0,
-	0x2b, 0xd8, 0xc0, 0xd7, 0xa0, 0x1d, 0xf2, 0x4f, 0xa8, 0xb9, 0x6d, 0x39, 0x16, 0x8b, 0x95, 0x02,
-	0x01, 0x4d, 0x39, 0x52, 0x6e, 0x5b, 0xf5, 0x01, 0xef, 0xce, 0x26, 0xde, 0x70, 0xdf, 0x86, 0xc4,
-	0x65, 0x96, 0x9d, 0xd6, 0x5e, 0x06, 0x6c, 0x95, 0x65, 0x25, 0x57, 0x96, 0xe7, 0x95, 0x2c, 0x2c,
-	0xf1, 0xa9, 0xe1, 0xbb, 0x45, 0x9f, 0x39, 0xc9, 0x62, 0xda, 0xd7, 0x31, 0x63, 0x3b, 0x9c, 0xf3,
-	0x8a, 0xf6, 0x00, 0x7a, 0x05, 0x2b, 0x78, 0x00, 0xcd, 0xc4, 0x4e, 0xac, 0x58, 0xba, 0xcf, 0xcf,
-	0x8d, 0xb4, 0x87, 0xff, 0x42, 0x50, 0x8f, 0xe6, 0x13, 0xd6, 0xa1, 0x47, 0x4c, 0xea, 0xb2, 0xf9,
-	0x6a, 0x35, 0x8f, 0x47, 0x19, 0x2a, 0xce, 0xd8, 0x88, 0x3a, 0x3e, 0xe2, 0xbc, 0xe3, 0xe3, 0x74,
-	0xb0, 0x75, 0xc5, 0xc5, 0xe3, 0x55, 0x04, 0x0c, 0x7e, 0x44, 0xd0, 0xcd, 0x51, 0xb2, 0x9c, 0x50,
-	0x21, 0x27, 0xc7, 0x72, 0xe3, 0x80, 0xf8, 0x52, 0x20, 0xe4, 0x75, 0x92, 0xa5, 0x43, 0x5e, 0xef,
-	0xca, 0xcd, 0x11, 0xf2, 0xd2, 0x8c, 0xbe, 0x95, 0x0c, 0xbe, 0xc4, 0x1d, 0x40, 0x6b, 0xa5, 0x3e,
-	0x94, 0x47, 0x17, 0x0c, 0xb4, 0xe6, 0x3b, 0x57, 0x69, 0x88, 0xe2, 0x47, 0xee, 0xa4, 0x99, 0xcc,
-	0xe5, 0x9b, 0xef, 0x40, 0x2b, 0xfd, 0x8a, 0xc1, 0x7b, 0x00, 0x4f, 0x9e, 0x4d, 0xa7, 0xf3, 0xe7,
-	0x47, 0xd3, 0x67, 0x0f, 0xfb, 0xd2, 0xcd, 0x0f, 0xa0, 0x9b, 0x6b, 0x62, 0xdc, 0x85, 0x56, 0x5a,
-	0x92, 0x7d, 0x09, 0xb7, 0xa1, 0x11, 0x8b, 0xdd, 0x47, 0x93, 0xfe, 0x6f, 0x6f, 0x0e, 0xd0, 0xef,
-	0x6f, 0x0e, 0xd0, 0x1f, 0x6f, 0x0e, 0xd0, 0xcf, 0x7f, 0x1e, 0x48, 0x8b, 0xba, 0x50, 0xe8, 0xf6,
-	0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x14, 0x3b, 0x4c, 0x77, 0x38, 0x0c, 0x00, 0x00,
+	// 451 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x91, 0xdf, 0x6a, 0xdb, 0x30,
+	0x18, 0xc5, 0xad, 0x3a, 0x76, 0xe2, 0xcf, 0x5b, 0x1a, 0xb4, 0x3f, 0x88, 0x0e, 0x8c, 0x6b, 0x18,
+	0x78, 0xff, 0x32, 0x48, 0x77, 0xb1, 0xed, 0x62, 0xd0, 0x40, 0x87, 0x37, 0xbc, 0x0e, 0x04, 0xed,
+	0x2e, 0x8b, 0xb3, 0x28, 0xc6, 0xab, 0x22, 0x05, 0x5b, 0x2e, 0xe4, 0x3d, 0x76, 0xb1, 0x47, 0xda,
+	0x65, 0x1f, 0x61, 0x64, 0x2f, 0x32, 0x24, 0xdb, 0x4d, 0xc9, 0xc6, 0xae, 0x12, 0x9d, 0x73, 0x7e,
+	0xd2, 0xf9, 0xfc, 0x81, 0xcf, 0xae, 0x98, 0x50, 0xe3, 0x55, 0x29, 0x95, 0xc4, 0x03, 0xf3, 0x33,
+	0xab, 0x17, 0xd1, 0x3b, 0x18, 0x7e, 0x62, 0x55, 0x95, 0xe5, 0xec, 0x4b, 0x99, 0xad, 0x56, 0xac,
+	0xc4, 0x87, 0x60, 0x73, 0x99, 0x13, 0x14, 0xa2, 0xd8, 0x9f, 0xdc, 0x1d, 0x77, 0xc9, 0x71, 0x2a,
+	0xf3, 0xc4, 0xa2, 0xda, 0x9b, 0x7a, 0xd0, 0x5f, 0x36, 0x50, 0xf4, 0x0a, 0xec, 0x54, 0xe6, 0xf8,
+	0x05, 0xb8, 0x72, 0xf6, 0x8d, 0x7d, 0x55, 0x2d, 0xf7, 0x60, 0xcb, 0x9d, 0x67, 0xbc, 0x66, 0x9f,
+	0x8d, 0x49, 0xdb, 0x50, 0x74, 0xbd, 0x07, 0x8e, 0xd1, 0xf1, 0x13, 0xe8, 0x89, 0x9a, 0x73, 0x83,
+	0x0d, 0x27, 0xf7, 0x76, 0xb0, 0xd3, 0x9a, 0xf3, 0xc4, 0xa2, 0x26, 0x82, 0x9f, 0x83, 0x93, 0x95,
+	0x65, 0xb6, 0x26, 0x7b, 0xe6, 0x89, 0xfb, 0x3b, 0xd9, 0x63, 0xed, 0x25, 0x16, 0x6d, 0x42, 0xf8,
+	0x00, 0xfa, 0x33, 0x29, 0x39, 0xcb, 0x04, 0xb1, 0x43, 0x14, 0x0f, 0x12, 0x8b, 0x76, 0x02, 0x7e,
+	0x08, 0xce, 0x82, 0xcb, 0x4c, 0x91, 0x5e, 0x88, 0x62, 0xa4, 0x19, 0x73, 0xd4, 0x4c, 0x21, 0x14,
+	0xcb, 0x59, 0x49, 0x9c, 0x10, 0xc5, 0xb6, 0x66, 0x5a, 0x01, 0xbf, 0xbc, 0x99, 0xd0, 0xfd, 0xcf,
+	0x84, 0x89, 0xd5, 0xcd, 0x88, 0x09, 0xb8, 0x95, 0x2a, 0x0b, 0x91, 0x93, 0x7e, 0x88, 0xe2, 0x3b,
+	0xda, 0x69, 0xce, 0x38, 0x00, 0x4f, 0x15, 0x4b, 0x56, 0xa9, 0x6c, 0xb9, 0x22, 0x83, 0xf6, 0xa1,
+	0xad, 0x84, 0x9f, 0xc1, 0xa8, 0x16, 0x55, 0x91, 0x0b, 0x36, 0xbf, 0xe8, 0xfa, 0x78, 0x21, 0x8a,
+	0x7b, 0x89, 0x45, 0xf7, 0x3b, 0xe7, 0x43, 0x63, 0x4c, 0x5d, 0xe8, 0x5d, 0x16, 0x62, 0x1e, 0x1d,
+	0x01, 0x6c, 0x3f, 0x03, 0x7e, 0x0c, 0x4e, 0xa1, 0xd8, 0xb2, 0x22, 0x28, 0xb4, 0x63, 0x7f, 0xb2,
+	0xbf, 0x53, 0x96, 0x36, 0x6e, 0xf4, 0x1d, 0x81, 0x7f, 0xab, 0x3d, 0x7e, 0x03, 0xee, 0xa2, 0x60,
+	0x7c, 0xde, 0x71, 0x87, 0xff, 0x1c, 0x72, 0xfc, 0xde, 0x64, 0x4e, 0x84, 0x2a, 0xd7, 0xb4, 0x05,
+	0x0e, 0x3e, 0x82, 0x7f, 0x4b, 0xc6, 0x23, 0xb0, 0x2f, 0xd9, 0xda, 0xac, 0xd5, 0xa3, 0xfa, 0xaf,
+	0xae, 0x74, 0xa5, 0xef, 0x68, 0xd7, 0xf7, 0x77, 0x25, 0xe3, 0xbe, 0xdd, 0x7b, 0x8d, 0x9e, 0x3e,
+	0x02, 0xef, 0x66, 0xfd, 0x78, 0x08, 0x70, 0x7a, 0x96, 0xa6, 0x17, 0xe7, 0xc7, 0xe9, 0xd9, 0xc9,
+	0xc8, 0x9a, 0x8e, 0x7e, 0x6e, 0x02, 0x74, 0xbd, 0x09, 0xd0, 0xaf, 0x4d, 0x80, 0x7e, 0xfc, 0x0e,
+	0xac, 0x99, 0x6b, 0x6e, 0x3a, 0xfa, 0x13, 0x00, 0x00, 0xff, 0xff, 0x5d, 0x7c, 0xf3, 0x69, 0xe3,
+	0x02, 0x00, 0x00,
 }
 
-func (m *EventWrapper) Marshal() (dAtA []byte, err error) {
+func (m *MessageWrapper) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1710,12 +499,12 @@ func (m *EventWrapper) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *EventWrapper) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessageWrapper) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *EventWrapper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessageWrapper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1724,11 +513,11 @@ func (m *EventWrapper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if m.Event != nil {
+	if m.Message != nil {
 		{
-			size := m.Event.Size()
+			size := m.Message.Size()
 			i -= size
-			if _, err := m.Event.MarshalTo(dAtA[i:]); err != nil {
+			if _, err := m.Message.MarshalTo(dAtA[i:]); err != nil {
 				return 0, err
 			}
 		}
@@ -1736,12 +525,12 @@ func (m *EventWrapper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *EventWrapper_Log) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessageWrapper_Log) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *EventWrapper_Log) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessageWrapper_Log) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.Log != nil {
 		{
@@ -1754,27 +543,6 @@ func (m *EventWrapper_Log) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		}
 		i--
 		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-func (m *EventWrapper_Metric) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *EventWrapper_Metric) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Metric != nil {
-		{
-			size, err := m.Metric.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
 	}
 	return len(dAtA) - i, nil
 }
@@ -1802,36 +570,22 @@ func (m *Log) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if len(m.Fields) > 0 {
-		for k := range m.Fields {
-			v := m.Fields[k]
-			baseI := i
-			if v != nil {
-				{
-					size, err := v.MarshalToSizedBuffer(dAtA[:i])
-					if err != nil {
-						return 0, err
-					}
-					i -= size
-					i = encodeVarintEvent(dAtA, i, uint64(size))
-				}
-				i--
-				dAtA[i] = 0x12
+	if m.Object != nil {
+		{
+			size, err := m.Object.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
 			}
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintEvent(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintEvent(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0xa
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *ValueMap) Marshal() (dAtA []byte, err error) {
+func (m *Value) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1841,12 +595,12 @@ func (m *ValueMap) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ValueMap) MarshalTo(dAtA []byte) (int, error) {
+func (m *Value) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ValueMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Value) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1855,35 +609,154 @@ func (m *ValueMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if len(m.Fields) > 0 {
-		for k := range m.Fields {
-			v := m.Fields[k]
-			baseI := i
-			if v != nil {
-				{
-					size, err := v.MarshalToSizedBuffer(dAtA[:i])
-					if err != nil {
-						return 0, err
-					}
-					i -= size
-					i = encodeVarintEvent(dAtA, i, uint64(size))
-				}
-				i--
-				dAtA[i] = 0x12
+	if m.Kind != nil {
+		{
+			size := m.Kind.Size()
+			i -= size
+			if _, err := m.Kind.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
 			}
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintEvent(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintEvent(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0xa
 		}
 	}
 	return len(dAtA) - i, nil
 }
 
+func (m *Value_Null) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Value_Null) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintEvent(dAtA, i, uint64(m.Null))
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+func (m *Value_Array) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Value_Array) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Array != nil {
+		{
+			size, err := m.Array.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Value_Boolean) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Value_Boolean) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.Boolean {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x18
+	return len(dAtA) - i, nil
+}
+func (m *Value_Float) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Value_Float) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= 8
+	encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Float))))
+	i--
+	dAtA[i] = 0x21
+	return len(dAtA) - i, nil
+}
+func (m *Value_Integer) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Value_Integer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintEvent(dAtA, i, uint64(m.Integer))
+	i--
+	dAtA[i] = 0x28
+	return len(dAtA) - i, nil
+}
+func (m *Value_Object) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Value_Object) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Object != nil {
+		{
+			size, err := m.Object.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Value_String_) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Value_String_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.String_ != nil {
+		i -= len(m.String_)
+		copy(dAtA[i:], m.String_)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.String_)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Value_Timestamp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Value_Timestamp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintEvent(dAtA, i, uint64(m.Timestamp))
+	i--
+	dAtA[i] = 0x40
+	return len(dAtA) - i, nil
+}
+func (m *Value_UnsignedInteger) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Value_UnsignedInteger) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintEvent(dAtA, i, uint64(m.UnsignedInteger))
+	i--
+	dAtA[i] = 0x48
+	return len(dAtA) - i, nil
+}
 func (m *ValueArray) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1925,7 +798,7 @@ func (m *ValueArray) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *Value) Marshal() (dAtA []byte, err error) {
+func (m *ValueObject) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1935,12 +808,12 @@ func (m *Value) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Value) MarshalTo(dAtA []byte) (int, error) {
+func (m *ValueObject) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *Value) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ValueObject) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1949,205 +822,22 @@ func (m *Value) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if m.Kind != nil {
-		{
-			size := m.Kind.Size()
-			i -= size
-			if _, err := m.Kind.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Value_RawBytes) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Value_RawBytes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.RawBytes != nil {
-		i -= len(m.RawBytes)
-		copy(dAtA[i:], m.RawBytes)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.RawBytes)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Value_Timestamp) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Value_Timestamp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Timestamp != nil {
-		{
-			size, err := m.Timestamp.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Value_Integer) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Value_Integer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	i = encodeVarintEvent(dAtA, i, uint64(m.Integer))
-	i--
-	dAtA[i] = 0x20
-	return len(dAtA) - i, nil
-}
-func (m *Value_Float) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Value_Float) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	i -= 8
-	encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Float))))
-	i--
-	dAtA[i] = 0x29
-	return len(dAtA) - i, nil
-}
-func (m *Value_Boolean) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Value_Boolean) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	i--
-	if m.Boolean {
-		dAtA[i] = 1
-	} else {
-		dAtA[i] = 0
-	}
-	i--
-	dAtA[i] = 0x30
-	return len(dAtA) - i, nil
-}
-func (m *Value_Map) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Value_Map) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Map != nil {
-		{
-			size, err := m.Map.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x3a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Value_Array) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Value_Array) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Array != nil {
-		{
-			size, err := m.Array.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x42
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Value_Null) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Value_Null) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	i = encodeVarintEvent(dAtA, i, uint64(m.Null))
-	i--
-	dAtA[i] = 0x48
-	return len(dAtA) - i, nil
-}
-func (m *Metric) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Metric) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Value != nil {
-		{
-			size := m.Value.Size()
-			i -= size
-			if _, err := m.Value.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.Namespace)))
-		i--
-		dAtA[i] = 0x5a
-	}
-	if m.Kind != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Kind))
-		i--
-		dAtA[i] = 0x20
-	}
-	if len(m.Tags) > 0 {
-		for k := range m.Tags {
-			v := m.Tags[k]
+	if len(m.Fields) > 0 {
+		for k := range m.Fields {
+			v := m.Fields[k]
 			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintEvent(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
+			if v != nil {
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintEvent(dAtA, i, uint64(size))
+				}
+				i--
+				dAtA[i] = 0x12
+			}
 			i -= len(k)
 			copy(dAtA[i:], k)
 			i = encodeVarintEvent(dAtA, i, uint64(len(k)))
@@ -2155,938 +845,8 @@ func (m *Metric) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0xa
 			i = encodeVarintEvent(dAtA, i, uint64(baseI-i))
 			i--
-			dAtA[i] = 0x1a
-		}
-	}
-	if m.Timestamp != nil {
-		{
-			size, err := m.Timestamp.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Metric_Counter) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_Counter) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Counter != nil {
-		{
-			size, err := m.Counter.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x2a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Metric_Gauge) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_Gauge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Gauge != nil {
-		{
-			size, err := m.Gauge.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x32
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Metric_Set) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_Set) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Set != nil {
-		{
-			size, err := m.Set.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x3a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Metric_Distribution1) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_Distribution1) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Distribution1 != nil {
-		{
-			size, err := m.Distribution1.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x42
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Metric_AggregatedHistogram1) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_AggregatedHistogram1) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.AggregatedHistogram1 != nil {
-		{
-			size, err := m.AggregatedHistogram1.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x4a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Metric_AggregatedSummary1) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_AggregatedSummary1) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.AggregatedSummary1 != nil {
-		{
-			size, err := m.AggregatedSummary1.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x52
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Metric_Distribution2) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_Distribution2) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Distribution2 != nil {
-		{
-			size, err := m.Distribution2.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x62
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Metric_AggregatedHistogram2) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_AggregatedHistogram2) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.AggregatedHistogram2 != nil {
-		{
-			size, err := m.AggregatedHistogram2.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x6a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Metric_AggregatedSummary2) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_AggregatedSummary2) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.AggregatedSummary2 != nil {
-		{
-			size, err := m.AggregatedSummary2.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x72
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Metric_Sketch) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Metric_Sketch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Sketch != nil {
-		{
-			size, err := m.Sketch.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x7a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Counter) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Counter) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Counter) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Value != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Value))))
-		i--
-		dAtA[i] = 0x9
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Gauge) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Gauge) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Gauge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Value != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Value))))
-		i--
-		dAtA[i] = 0x9
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Set) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Set) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Set) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if len(m.Values) > 0 {
-		for iNdEx := len(m.Values) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.Values[iNdEx])
-			copy(dAtA[i:], m.Values[iNdEx])
-			i = encodeVarintEvent(dAtA, i, uint64(len(m.Values[iNdEx])))
-			i--
 			dAtA[i] = 0xa
 		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Distribution1) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Distribution1) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Distribution1) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Statistic != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Statistic))
-		i--
-		dAtA[i] = 0x18
-	}
-	if len(m.SampleRates) > 0 {
-		dAtA20 := make([]byte, len(m.SampleRates)*10)
-		var j19 int
-		for _, num := range m.SampleRates {
-			for num >= 1<<7 {
-				dAtA20[j19] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j19++
-			}
-			dAtA20[j19] = uint8(num)
-			j19++
-		}
-		i -= j19
-		copy(dAtA[i:], dAtA20[:j19])
-		i = encodeVarintEvent(dAtA, i, uint64(j19))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Values) > 0 {
-		for iNdEx := len(m.Values) - 1; iNdEx >= 0; iNdEx-- {
-			f21 := math.Float64bits(float64(m.Values[iNdEx]))
-			i -= 8
-			encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(f21))
-		}
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.Values)*8))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Distribution2) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Distribution2) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Distribution2) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Statistic != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Statistic))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Samples) > 0 {
-		for iNdEx := len(m.Samples) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Samples[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintEvent(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *DistributionSample) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *DistributionSample) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *DistributionSample) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Rate != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Rate))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Value != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Value))))
-		i--
-		dAtA[i] = 0x9
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *AggregatedHistogram1) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AggregatedHistogram1) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *AggregatedHistogram1) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Sum != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Sum))))
-		i--
-		dAtA[i] = 0x21
-	}
-	if m.Count != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x18
-	}
-	if len(m.Counts) > 0 {
-		dAtA23 := make([]byte, len(m.Counts)*10)
-		var j22 int
-		for _, num := range m.Counts {
-			for num >= 1<<7 {
-				dAtA23[j22] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j22++
-			}
-			dAtA23[j22] = uint8(num)
-			j22++
-		}
-		i -= j22
-		copy(dAtA[i:], dAtA23[:j22])
-		i = encodeVarintEvent(dAtA, i, uint64(j22))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Buckets) > 0 {
-		for iNdEx := len(m.Buckets) - 1; iNdEx >= 0; iNdEx-- {
-			f24 := math.Float64bits(float64(m.Buckets[iNdEx]))
-			i -= 8
-			encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(f24))
-		}
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.Buckets)*8))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *AggregatedHistogram2) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AggregatedHistogram2) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *AggregatedHistogram2) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Sum != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Sum))))
-		i--
-		dAtA[i] = 0x19
-	}
-	if m.Count != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Buckets) > 0 {
-		for iNdEx := len(m.Buckets) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Buckets[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintEvent(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *HistogramBucket) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *HistogramBucket) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *HistogramBucket) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Count != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.UpperLimit != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.UpperLimit))))
-		i--
-		dAtA[i] = 0x9
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *AggregatedSummary1) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AggregatedSummary1) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *AggregatedSummary1) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Sum != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Sum))))
-		i--
-		dAtA[i] = 0x21
-	}
-	if m.Count != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x18
-	}
-	if len(m.Values) > 0 {
-		for iNdEx := len(m.Values) - 1; iNdEx >= 0; iNdEx-- {
-			f25 := math.Float64bits(float64(m.Values[iNdEx]))
-			i -= 8
-			encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(f25))
-		}
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.Values)*8))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Quantiles) > 0 {
-		for iNdEx := len(m.Quantiles) - 1; iNdEx >= 0; iNdEx-- {
-			f26 := math.Float64bits(float64(m.Quantiles[iNdEx]))
-			i -= 8
-			encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(f26))
-		}
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.Quantiles)*8))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *AggregatedSummary2) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AggregatedSummary2) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *AggregatedSummary2) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Sum != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Sum))))
-		i--
-		dAtA[i] = 0x19
-	}
-	if m.Count != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Quantiles) > 0 {
-		for iNdEx := len(m.Quantiles) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Quantiles[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintEvent(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *SummaryQuantile) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SummaryQuantile) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SummaryQuantile) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Value != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Value))))
-		i--
-		dAtA[i] = 0x11
-	}
-	if m.Quantile != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Quantile))))
-		i--
-		dAtA[i] = 0x9
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Sketch) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Sketch) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Sketch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if m.Sketch != nil {
-		{
-			size := m.Sketch.Size()
-			i -= size
-			if _, err := m.Sketch.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Sketch_AgentDdSketch) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Sketch_AgentDdSketch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.AgentDdSketch != nil {
-		{
-			size, err := m.AgentDdSketch.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintEvent(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Sketch_AgentDDSketch) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Sketch_AgentDDSketch) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Sketch_AgentDDSketch) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if len(m.N) > 0 {
-		dAtA29 := make([]byte, len(m.N)*10)
-		var j28 int
-		for _, num := range m.N {
-			for num >= 1<<7 {
-				dAtA29[j28] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j28++
-			}
-			dAtA29[j28] = uint8(num)
-			j28++
-		}
-		i -= j28
-		copy(dAtA[i:], dAtA29[:j28])
-		i = encodeVarintEvent(dAtA, i, uint64(j28))
-		i--
-		dAtA[i] = 0x3a
-	}
-	if len(m.K) > 0 {
-		dAtA30 := make([]byte, len(m.K)*5)
-		var j31 int
-		for _, num := range m.K {
-			x32 := (uint32(num) << 1) ^ uint32((num >> 31))
-			for x32 >= 1<<7 {
-				dAtA30[j31] = uint8(uint64(x32)&0x7f | 0x80)
-				j31++
-				x32 >>= 7
-			}
-			dAtA30[j31] = uint8(x32)
-			j31++
-		}
-		i -= j31
-		copy(dAtA[i:], dAtA30[:j31])
-		i = encodeVarintEvent(dAtA, i, uint64(j31))
-		i--
-		dAtA[i] = 0x32
-	}
-	if m.Avg != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Avg))))
-		i--
-		dAtA[i] = 0x29
-	}
-	if m.Sum != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Sum))))
-		i--
-		dAtA[i] = 0x21
-	}
-	if m.Max != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Max))))
-		i--
-		dAtA[i] = 0x19
-	}
-	if m.Min != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Min))))
-		i--
-		dAtA[i] = 0x11
-	}
-	if m.Count != 0 {
-		i = encodeVarintEvent(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -3102,14 +862,14 @@ func encodeVarintEvent(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *EventWrapper) Size() (n int) {
+func (m *MessageWrapper) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Event != nil {
-		n += m.Event.Size()
+	if m.Message != nil {
+		n += m.Message.Size()
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -3117,7 +877,7 @@ func (m *EventWrapper) Size() (n int) {
 	return n
 }
 
-func (m *EventWrapper_Log) Size() (n int) {
+func (m *MessageWrapper_Log) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3129,79 +889,15 @@ func (m *EventWrapper_Log) Size() (n int) {
 	}
 	return n
 }
-func (m *EventWrapper_Metric) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Metric != nil {
-		l = m.Metric.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
 func (m *Log) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.Fields) > 0 {
-		for k, v := range m.Fields {
-			_ = k
-			_ = v
-			l = 0
-			if v != nil {
-				l = v.Size()
-				l += 1 + sovEvent(uint64(l))
-			}
-			mapEntrySize := 1 + len(k) + sovEvent(uint64(len(k))) + l
-			n += mapEntrySize + 1 + sovEvent(uint64(mapEntrySize))
-		}
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *ValueMap) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Fields) > 0 {
-		for k, v := range m.Fields {
-			_ = k
-			_ = v
-			l = 0
-			if v != nil {
-				l = v.Size()
-				l += 1 + sovEvent(uint64(l))
-			}
-			mapEntrySize := 1 + len(k) + sovEvent(uint64(len(k))) + l
-			n += mapEntrySize + 1 + sovEvent(uint64(mapEntrySize))
-		}
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *ValueArray) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Items) > 0 {
-		for _, e := range m.Items {
-			l = e.Size()
-			n += 1 + l + sovEvent(uint64(l))
-		}
+	if m.Object != nil {
+		l = m.Object.Size()
+		n += 1 + l + sovEvent(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -3224,67 +920,13 @@ func (m *Value) Size() (n int) {
 	return n
 }
 
-func (m *Value_RawBytes) Size() (n int) {
+func (m *Value_Null) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.RawBytes != nil {
-		l = len(m.RawBytes)
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Value_Timestamp) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Timestamp != nil {
-		l = m.Timestamp.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Value_Integer) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	n += 1 + sovEvent(uint64(m.Integer))
-	return n
-}
-func (m *Value_Float) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	n += 9
-	return n
-}
-func (m *Value_Boolean) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	n += 2
-	return n
-}
-func (m *Value_Map) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Map != nil {
-		l = m.Map.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
+	n += 1 + sovEvent(uint64(m.Null))
 	return n
 }
 func (m *Value_Array) Size() (n int) {
@@ -3299,482 +941,111 @@ func (m *Value_Array) Size() (n int) {
 	}
 	return n
 }
-func (m *Value_Null) Size() (n int) {
+func (m *Value_Boolean) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	n += 1 + sovEvent(uint64(m.Null))
+	n += 2
 	return n
 }
-func (m *Metric) Size() (n int) {
+func (m *Value_Float) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Name)
-	if l > 0 {
+	n += 9
+	return n
+}
+func (m *Value_Integer) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 1 + sovEvent(uint64(m.Integer))
+	return n
+}
+func (m *Value_Object) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Object != nil {
+		l = m.Object.Size()
 		n += 1 + l + sovEvent(uint64(l))
 	}
-	if m.Timestamp != nil {
-		l = m.Timestamp.Size()
+	return n
+}
+func (m *Value_String_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.String_ != nil {
+		l = len(m.String_)
 		n += 1 + l + sovEvent(uint64(l))
 	}
-	if len(m.Tags) > 0 {
-		for k, v := range m.Tags {
+	return n
+}
+func (m *Value_Timestamp) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 1 + sovEvent(uint64(m.Timestamp))
+	return n
+}
+func (m *Value_UnsignedInteger) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 1 + sovEvent(uint64(m.UnsignedInteger))
+	return n
+}
+func (m *ValueArray) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Items) > 0 {
+		for _, e := range m.Items {
+			l = e.Size()
+			n += 1 + l + sovEvent(uint64(l))
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *ValueObject) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Fields) > 0 {
+		for k, v := range m.Fields {
 			_ = k
 			_ = v
-			mapEntrySize := 1 + len(k) + sovEvent(uint64(len(k))) + 1 + len(v) + sovEvent(uint64(len(v)))
+			l = 0
+			if v != nil {
+				l = v.Size()
+				l += 1 + sovEvent(uint64(l))
+			}
+			mapEntrySize := 1 + len(k) + sovEvent(uint64(len(k))) + l
 			n += mapEntrySize + 1 + sovEvent(uint64(mapEntrySize))
 		}
-	}
-	if m.Kind != 0 {
-		n += 1 + sovEvent(uint64(m.Kind))
-	}
-	if m.Value != nil {
-		n += m.Value.Size()
-	}
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *Metric_Counter) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Counter != nil {
-		l = m.Counter.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Metric_Gauge) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Gauge != nil {
-		l = m.Gauge.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Metric_Set) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Set != nil {
-		l = m.Set.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Metric_Distribution1) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Distribution1 != nil {
-		l = m.Distribution1.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Metric_AggregatedHistogram1) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AggregatedHistogram1 != nil {
-		l = m.AggregatedHistogram1.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Metric_AggregatedSummary1) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AggregatedSummary1 != nil {
-		l = m.AggregatedSummary1.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Metric_Distribution2) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Distribution2 != nil {
-		l = m.Distribution2.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Metric_AggregatedHistogram2) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AggregatedHistogram2 != nil {
-		l = m.AggregatedHistogram2.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Metric_AggregatedSummary2) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AggregatedSummary2 != nil {
-		l = m.AggregatedSummary2.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Metric_Sketch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Sketch != nil {
-		l = m.Sketch.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Counter) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Value != 0 {
-		n += 9
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *Gauge) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Value != 0 {
-		n += 9
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *Set) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Values) > 0 {
-		for _, s := range m.Values {
-			l = len(s)
-			n += 1 + l + sovEvent(uint64(l))
-		}
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *Distribution1) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Values) > 0 {
-		n += 1 + sovEvent(uint64(len(m.Values)*8)) + len(m.Values)*8
-	}
-	if len(m.SampleRates) > 0 {
-		l = 0
-		for _, e := range m.SampleRates {
-			l += sovEvent(uint64(e))
-		}
-		n += 1 + sovEvent(uint64(l)) + l
-	}
-	if m.Statistic != 0 {
-		n += 1 + sovEvent(uint64(m.Statistic))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *Distribution2) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Samples) > 0 {
-		for _, e := range m.Samples {
-			l = e.Size()
-			n += 1 + l + sovEvent(uint64(l))
-		}
-	}
-	if m.Statistic != 0 {
-		n += 1 + sovEvent(uint64(m.Statistic))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *DistributionSample) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Value != 0 {
-		n += 9
-	}
-	if m.Rate != 0 {
-		n += 1 + sovEvent(uint64(m.Rate))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *AggregatedHistogram1) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Buckets) > 0 {
-		n += 1 + sovEvent(uint64(len(m.Buckets)*8)) + len(m.Buckets)*8
-	}
-	if len(m.Counts) > 0 {
-		l = 0
-		for _, e := range m.Counts {
-			l += sovEvent(uint64(e))
-		}
-		n += 1 + sovEvent(uint64(l)) + l
-	}
-	if m.Count != 0 {
-		n += 1 + sovEvent(uint64(m.Count))
-	}
-	if m.Sum != 0 {
-		n += 9
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *AggregatedHistogram2) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Buckets) > 0 {
-		for _, e := range m.Buckets {
-			l = e.Size()
-			n += 1 + l + sovEvent(uint64(l))
-		}
-	}
-	if m.Count != 0 {
-		n += 1 + sovEvent(uint64(m.Count))
-	}
-	if m.Sum != 0 {
-		n += 9
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *HistogramBucket) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.UpperLimit != 0 {
-		n += 9
-	}
-	if m.Count != 0 {
-		n += 1 + sovEvent(uint64(m.Count))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *AggregatedSummary1) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Quantiles) > 0 {
-		n += 1 + sovEvent(uint64(len(m.Quantiles)*8)) + len(m.Quantiles)*8
-	}
-	if len(m.Values) > 0 {
-		n += 1 + sovEvent(uint64(len(m.Values)*8)) + len(m.Values)*8
-	}
-	if m.Count != 0 {
-		n += 1 + sovEvent(uint64(m.Count))
-	}
-	if m.Sum != 0 {
-		n += 9
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *AggregatedSummary2) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Quantiles) > 0 {
-		for _, e := range m.Quantiles {
-			l = e.Size()
-			n += 1 + l + sovEvent(uint64(l))
-		}
-	}
-	if m.Count != 0 {
-		n += 1 + sovEvent(uint64(m.Count))
-	}
-	if m.Sum != 0 {
-		n += 9
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *SummaryQuantile) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Quantile != 0 {
-		n += 9
-	}
-	if m.Value != 0 {
-		n += 9
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *Sketch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Sketch != nil {
-		n += m.Sketch.Size()
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *Sketch_AgentDdSketch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AgentDdSketch != nil {
-		l = m.AgentDdSketch.Size()
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	return n
-}
-func (m *Sketch_AgentDDSketch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Count != 0 {
-		n += 1 + sovEvent(uint64(m.Count))
-	}
-	if m.Min != 0 {
-		n += 9
-	}
-	if m.Max != 0 {
-		n += 9
-	}
-	if m.Sum != 0 {
-		n += 9
-	}
-	if m.Avg != 0 {
-		n += 9
-	}
-	if len(m.K) > 0 {
-		l = 0
-		for _, e := range m.K {
-			l += sozEvent(uint64(e))
-		}
-		n += 1 + sovEvent(uint64(l)) + l
-	}
-	if len(m.N) > 0 {
-		l = 0
-		for _, e := range m.N {
-			l += sovEvent(uint64(e))
-		}
-		n += 1 + sovEvent(uint64(l)) + l
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -3788,7 +1059,7 @@ func sovEvent(x uint64) (n int) {
 func sozEvent(x uint64) (n int) {
 	return sovEvent(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *EventWrapper) Unmarshal(dAtA []byte) error {
+func (m *MessageWrapper) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3811,10 +1082,10 @@ func (m *EventWrapper) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: EventWrapper: wiretype end group for non-group")
+			return fmt.Errorf("proto: MessageWrapper: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: EventWrapper: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MessageWrapper: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3850,42 +1121,7 @@ func (m *EventWrapper) Unmarshal(dAtA []byte) error {
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Event = &EventWrapper_Log{v}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Metric", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Metric{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Event = &EventWrapper_Metric{v}
+			m.Message = &MessageWrapper_Log{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3940,7 +1176,7 @@ func (m *Log) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Fields", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Object", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3967,105 +1203,12 @@ func (m *Log) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Fields == nil {
-				m.Fields = make(map[string]*Value)
+			if m.Object == nil {
+				m.Object = &ValueObject{}
 			}
-			var mapkey string
-			var mapvalue *Value
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowEvent
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthEvent
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthEvent
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var mapmsglen int
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowEvent
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapmsglen |= int(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					if mapmsglen < 0 {
-						return ErrInvalidLengthEvent
-					}
-					postmsgIndex := iNdEx + mapmsglen
-					if postmsgIndex < 0 {
-						return ErrInvalidLengthEvent
-					}
-					if postmsgIndex > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = &Value{}
-					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
-						return err
-					}
-					iNdEx = postmsgIndex
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipEvent(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthEvent
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
+			if err := m.Object.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			m.Fields[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4089,7 +1232,7 @@ func (m *Log) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ValueMap) Unmarshal(dAtA []byte) error {
+func (m *Value) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4112,15 +1255,35 @@ func (m *ValueMap) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ValueMap: wiretype end group for non-group")
+			return fmt.Errorf("proto: Value: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ValueMap: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Value: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Null", wireType)
+			}
+			var v ValueNull
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= ValueNull(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Kind = &Value_Null{v}
+		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Fields", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Array", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4147,106 +1310,172 @@ func (m *ValueMap) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Fields == nil {
-				m.Fields = make(map[string]*Value)
+			v := &ValueArray{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			var mapkey string
-			var mapvalue *Value
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowEvent
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthEvent
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthEvent
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var mapmsglen int
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowEvent
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapmsglen |= int(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					if mapmsglen < 0 {
-						return ErrInvalidLengthEvent
-					}
-					postmsgIndex := iNdEx + mapmsglen
-					if postmsgIndex < 0 {
-						return ErrInvalidLengthEvent
-					}
-					if postmsgIndex > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = &Value{}
-					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
-						return err
-					}
-					iNdEx = postmsgIndex
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipEvent(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthEvent
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
-			}
-			m.Fields[mapkey] = mapvalue
+			m.Kind = &Value_Array{v}
 			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Boolean", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			b := bool(v != 0)
+			m.Kind = &Value_Boolean{b}
+		case 4:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Float", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Kind = &Value_Float{float64(math.Float64frombits(v))}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Integer", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Kind = &Value_Integer{v}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Object", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ValueObject{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Kind = &Value_Object{v}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field String_", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := make([]byte, postIndex-iNdEx)
+			copy(v, dAtA[iNdEx:postIndex])
+			m.Kind = &Value_String_{v}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Kind = &Value_Timestamp{v}
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UnsignedInteger", wireType)
+			}
+			var v uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Kind = &Value_UnsignedInteger{v}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEvent(dAtA[iNdEx:])
@@ -4354,7 +1583,7 @@ func (m *ValueArray) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Value) Unmarshal(dAtA []byte) error {
+func (m *ValueObject) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4377,48 +1606,15 @@ func (m *Value) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Value: wiretype end group for non-group")
+			return fmt.Errorf("proto: ValueObject: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Value: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ValueObject: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RawBytes", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := make([]byte, postIndex-iNdEx)
-			copy(v, dAtA[iNdEx:postIndex])
-			m.Kind = &Value_RawBytes{v}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Fields", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4445,307 +1641,11 @@ func (m *Value) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &types.Timestamp{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Kind = &Value_Timestamp{v}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Integer", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Kind = &Value_Integer{v}
-		case 5:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Float", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Kind = &Value_Float{float64(math.Float64frombits(v))}
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Boolean", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			b := bool(v != 0)
-			m.Kind = &Value_Boolean{b}
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Map", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &ValueMap{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Kind = &Value_Map{v}
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Array", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &ValueArray{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Kind = &Value_Array{v}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Null", wireType)
-			}
-			var v ValueNull
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= ValueNull(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Kind = &Value_Null{v}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Metric) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Metric: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Metric: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Timestamp == nil {
-				m.Timestamp = &types.Timestamp{}
-			}
-			if err := m.Timestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Tags", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Tags == nil {
-				m.Tags = make(map[string]string)
+			if m.Fields == nil {
+				m.Fields = make(map[string]*Value)
 			}
 			var mapkey string
-			var mapvalue string
+			var mapvalue *Value
 			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
@@ -4794,7 +1694,7 @@ func (m *Metric) Unmarshal(dAtA []byte) error {
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
 				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
+					var mapmsglen int
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowEvent
@@ -4804,24 +1704,26 @@ func (m *Metric) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
+						mapmsglen |= int(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
 					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
+					if mapmsglen < 0 {
 						return ErrInvalidLengthEvent
 					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
+					postmsgIndex := iNdEx + mapmsglen
+					if postmsgIndex < 0 {
 						return ErrInvalidLengthEvent
 					}
-					if postStringIndexmapvalue > l {
+					if postmsgIndex > l {
 						return io.ErrUnexpectedEOF
 					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
+					mapvalue = &Value{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
 				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipEvent(dAtA[iNdEx:])
@@ -4837,2139 +1739,8 @@ func (m *Metric) Unmarshal(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.Tags[mapkey] = mapvalue
+			m.Fields[mapkey] = mapvalue
 			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
-			}
-			m.Kind = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Kind |= Metric_Kind(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Counter", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Counter{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_Counter{v}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Gauge", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Gauge{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_Gauge{v}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Set", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Set{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_Set{v}
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Distribution1", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Distribution1{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_Distribution1{v}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AggregatedHistogram1", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &AggregatedHistogram1{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_AggregatedHistogram1{v}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AggregatedSummary1", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &AggregatedSummary1{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_AggregatedSummary1{v}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Distribution2", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Distribution2{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_Distribution2{v}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AggregatedHistogram2", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &AggregatedHistogram2{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_AggregatedHistogram2{v}
-			iNdEx = postIndex
-		case 14:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AggregatedSummary2", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &AggregatedSummary2{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_AggregatedSummary2{v}
-			iNdEx = postIndex
-		case 15:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sketch", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Sketch{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Value = &Metric_Sketch{v}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Counter) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Counter: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Counter: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Value = float64(math.Float64frombits(v))
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Gauge) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Gauge: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Gauge: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Value = float64(math.Float64frombits(v))
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Set) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Set: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Set: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Values", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Values = append(m.Values, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Distribution1) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Distribution1: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Distribution1: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType == 1 {
-				var v uint64
-				if (iNdEx + 8) > l {
-					return io.ErrUnexpectedEOF
-				}
-				v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-				iNdEx += 8
-				v2 := float64(math.Float64frombits(v))
-				m.Values = append(m.Values, v2)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthEvent
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthEvent
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				elementCount = packedLen / 8
-				if elementCount != 0 && len(m.Values) == 0 {
-					m.Values = make([]float64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					if (iNdEx + 8) > l {
-						return io.ErrUnexpectedEOF
-					}
-					v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-					iNdEx += 8
-					v2 := float64(math.Float64frombits(v))
-					m.Values = append(m.Values, v2)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Values", wireType)
-			}
-		case 2:
-			if wireType == 0 {
-				var v uint32
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint32(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.SampleRates = append(m.SampleRates, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthEvent
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthEvent
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.SampleRates) == 0 {
-					m.SampleRates = make([]uint32, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint32
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowEvent
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint32(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.SampleRates = append(m.SampleRates, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field SampleRates", wireType)
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Statistic", wireType)
-			}
-			m.Statistic = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Statistic |= StatisticKind(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Distribution2) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Distribution2: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Distribution2: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Samples", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Samples = append(m.Samples, &DistributionSample{})
-			if err := m.Samples[len(m.Samples)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Statistic", wireType)
-			}
-			m.Statistic = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Statistic |= StatisticKind(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *DistributionSample) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: DistributionSample: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DistributionSample: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Value = float64(math.Float64frombits(v))
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rate", wireType)
-			}
-			m.Rate = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Rate |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AggregatedHistogram1) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AggregatedHistogram1: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AggregatedHistogram1: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType == 1 {
-				var v uint64
-				if (iNdEx + 8) > l {
-					return io.ErrUnexpectedEOF
-				}
-				v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-				iNdEx += 8
-				v2 := float64(math.Float64frombits(v))
-				m.Buckets = append(m.Buckets, v2)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthEvent
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthEvent
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				elementCount = packedLen / 8
-				if elementCount != 0 && len(m.Buckets) == 0 {
-					m.Buckets = make([]float64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					if (iNdEx + 8) > l {
-						return io.ErrUnexpectedEOF
-					}
-					v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-					iNdEx += 8
-					v2 := float64(math.Float64frombits(v))
-					m.Buckets = append(m.Buckets, v2)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Buckets", wireType)
-			}
-		case 2:
-			if wireType == 0 {
-				var v uint32
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint32(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.Counts = append(m.Counts, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthEvent
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthEvent
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.Counts) == 0 {
-					m.Counts = make([]uint32, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint32
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowEvent
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint32(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.Counts = append(m.Counts, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Counts", wireType)
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sum", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Sum = float64(math.Float64frombits(v))
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AggregatedHistogram2) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AggregatedHistogram2: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AggregatedHistogram2: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Buckets", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Buckets = append(m.Buckets, &HistogramBucket{})
-			if err := m.Buckets[len(m.Buckets)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sum", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Sum = float64(math.Float64frombits(v))
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *HistogramBucket) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: HistogramBucket: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: HistogramBucket: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpperLimit", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.UpperLimit = float64(math.Float64frombits(v))
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AggregatedSummary1) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AggregatedSummary1: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AggregatedSummary1: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType == 1 {
-				var v uint64
-				if (iNdEx + 8) > l {
-					return io.ErrUnexpectedEOF
-				}
-				v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-				iNdEx += 8
-				v2 := float64(math.Float64frombits(v))
-				m.Quantiles = append(m.Quantiles, v2)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthEvent
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthEvent
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				elementCount = packedLen / 8
-				if elementCount != 0 && len(m.Quantiles) == 0 {
-					m.Quantiles = make([]float64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					if (iNdEx + 8) > l {
-						return io.ErrUnexpectedEOF
-					}
-					v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-					iNdEx += 8
-					v2 := float64(math.Float64frombits(v))
-					m.Quantiles = append(m.Quantiles, v2)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Quantiles", wireType)
-			}
-		case 2:
-			if wireType == 1 {
-				var v uint64
-				if (iNdEx + 8) > l {
-					return io.ErrUnexpectedEOF
-				}
-				v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-				iNdEx += 8
-				v2 := float64(math.Float64frombits(v))
-				m.Values = append(m.Values, v2)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthEvent
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthEvent
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				elementCount = packedLen / 8
-				if elementCount != 0 && len(m.Values) == 0 {
-					m.Values = make([]float64, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint64
-					if (iNdEx + 8) > l {
-						return io.ErrUnexpectedEOF
-					}
-					v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-					iNdEx += 8
-					v2 := float64(math.Float64frombits(v))
-					m.Values = append(m.Values, v2)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field Values", wireType)
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sum", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Sum = float64(math.Float64frombits(v))
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AggregatedSummary2) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AggregatedSummary2: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AggregatedSummary2: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Quantiles", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Quantiles = append(m.Quantiles, &SummaryQuantile{})
-			if err := m.Quantiles[len(m.Quantiles)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sum", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Sum = float64(math.Float64frombits(v))
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SummaryQuantile) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SummaryQuantile: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SummaryQuantile: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Quantile", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Quantile = float64(math.Float64frombits(v))
-		case 2:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Value = float64(math.Float64frombits(v))
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Sketch) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Sketch: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Sketch: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AgentDdSketch", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Sketch_AgentDDSketch{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Sketch = &Sketch_AgentDdSketch{v}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipEvent(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Sketch_AgentDDSketch) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowEvent
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AgentDDSketch: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AgentDDSketch: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvent
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Min", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Min = float64(math.Float64frombits(v))
-		case 3:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Max", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Max = float64(math.Float64frombits(v))
-		case 4:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Sum", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Sum = float64(math.Float64frombits(v))
-		case 5:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Avg", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Avg = float64(math.Float64frombits(v))
-		case 6:
-			if wireType == 0 {
-				var v int32
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int32(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				v = int32((uint32(v) >> 1) ^ uint32(((v&1)<<31)>>31))
-				m.K = append(m.K, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthEvent
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthEvent
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.K) == 0 {
-					m.K = make([]int32, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v int32
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowEvent
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= int32(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					v = int32((uint32(v) >> 1) ^ uint32(((v&1)<<31)>>31))
-					m.K = append(m.K, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field K", wireType)
-			}
-		case 7:
-			if wireType == 0 {
-				var v uint32
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= uint32(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				m.N = append(m.N, v)
-			} else if wireType == 2 {
-				var packedLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowEvent
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					packedLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if packedLen < 0 {
-					return ErrInvalidLengthEvent
-				}
-				postIndex := iNdEx + packedLen
-				if postIndex < 0 {
-					return ErrInvalidLengthEvent
-				}
-				if postIndex > l {
-					return io.ErrUnexpectedEOF
-				}
-				var elementCount int
-				var count int
-				for _, integer := range dAtA[iNdEx:postIndex] {
-					if integer < 128 {
-						count++
-					}
-				}
-				elementCount = count
-				if elementCount != 0 && len(m.N) == 0 {
-					m.N = make([]uint32, 0, elementCount)
-				}
-				for iNdEx < postIndex {
-					var v uint32
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowEvent
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						v |= uint32(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					m.N = append(m.N, v)
-				}
-			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field N", wireType)
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEvent(dAtA[iNdEx:])
