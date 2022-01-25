@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/elastic/go-ucfg v0.8.4
-	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.5
 	github.com/mitchellh/go-wordwrap v1.0.1
@@ -23,5 +22,6 @@ require (
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	golang.org/x/sys v0.0.0-20210603081109-ebe580a85c40 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 )
