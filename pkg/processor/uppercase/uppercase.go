@@ -53,7 +53,3 @@ func (p *Uppercase) Config() Config {
 func (p *Uppercase) String() string {
 	return processor.ConfigString(processorName, p.config)
 }
-
-func (p *Uppercase) Process(event processor.Event) error {
-	return nil
-}
