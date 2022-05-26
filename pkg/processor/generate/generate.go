@@ -27,14 +27,14 @@ func main() {
 	defer f.Close()
 
 	dec := yaml.NewDecoder(bufio.NewReader(f))
-	//dec.KnownFields(true)
-	//var i map[interface{}]interface{}
+	// dec.KnownFields(true)
+	// var i map[interface{}]interface{}
 	var p Processors
 	if err := dec.Decode(&p); err != nil {
 		log.Fatal(err)
 	}
 
-	//m := cleanMapInterface(i)
+	// m := cleanMapInterface(i)
 	data, err := json.MarshalIndent(p, "", "  ")
 	if err != nil {
 		log.Fatal(err)
@@ -49,7 +49,7 @@ func main() {
 
 			buf := new(bytes.Buffer)
 			err := goFileTemplate.Execute(buf, ProcessorTemplateVar{
-				License:   "// Foo License",
+				License:   "// Foo License", // TODO: Add license text.
 				Name:      name,
 				Processor: data,
 			})
@@ -58,16 +58,15 @@ func main() {
 			}
 
 			path := filepath.Join("..", name, name+".go")
-			if err = os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			if err = os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 				log.Fatal(err)
 			}
 
-			if err = ioutil.WriteFile(path, buf.Bytes(), 0644); err != nil {
+			if err = ioutil.WriteFile(path, buf.Bytes(), 0o644); err != nil {
 				log.Fatal(err)
 			}
 		}
 	}
-
 }
 
 type Processors struct {
@@ -143,7 +142,6 @@ func descriptionToComment(indent, desc string) string {
 		}
 	}
 	for i := 0; i < len(lines); i++ {
-
 	}
 	return trimTrailingWhitespace(strings.Join(lines, "\n"+indent+"// "))
 }
@@ -225,10 +223,8 @@ func isSeparator(c rune) bool {
 	}
 }
 
-var (
-	goFileTemplate = template.Must(template.New("type").Funcs(templateFuncs).Parse(
-		strings.Replace(typeTmpl[1:], `\u0060`, "`", -1)))
-)
+var goFileTemplate = template.Must(template.New("type").Funcs(templateFuncs).Parse(
+	strings.Replace(typeTmpl[1:], `\u0060`, "`", -1)))
 
 const typeTmpl = `
 {{.License}}

@@ -219,7 +219,7 @@ func TestEvent(t *testing.T) {
 }
 
 func TestKeyToPath(t *testing.T) {
-	var testCases = []struct {
+	testCases := []struct {
 		key  string
 		path []string
 	}{

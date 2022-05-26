@@ -57,7 +57,7 @@ func (r *Registry) Register(name string, constructorFunc interface{}) error {
 func (r *Registry) NewProcessor(name string, config map[string]interface{}) (interface{}, error) {
 	pc, found := r.procs[name]
 	if !found {
-		return nil, fmt.Errorf("proc not found")
+		return nil, fmt.Errorf("processor type %q not found", name)
 	}
 
 	procConfigValue := pc.newConfig()
@@ -127,5 +127,7 @@ func validateConfig(i interface{}) (*processorConstructor, error) {
 		},
 	}
 	v.Call([]reflect.Value{reflect.New(configType).Elem()})
+
+	// TODO: Validate that each processor implements a 'Conifg() struct' method.
 	return pc, nil
 }

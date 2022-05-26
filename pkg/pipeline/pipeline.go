@@ -10,6 +10,7 @@ type Processor interface {
 	Process(event *pipelineEvent) ([]*pipelineEvent, error)
 }
 
+// TODO: Each pipeline should also be usable as a processor within another pipeline.
 //var _ Processor = (*Pipeline)(nil)
 
 type Pipeline struct {
@@ -27,6 +28,7 @@ func New(config Config) (*Pipeline, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	onFailureProcessors, err := newPipelineProcessors(config.ID+".on_failure", config.OnFailure)
 	if err != nil {
 		return nil, err
@@ -46,54 +48,45 @@ func New(config Config) (*Pipeline, error) {
 //   Dropped event - Empty slice and nil error.
 //   Processing error - Empty slice and non-nil error.
 //   Event split - Slice length is greater than 1 and non-nil error.
-func (pipe *Pipeline) Process(evt *event.Event) ([]*event.Event, error) {
+func (pipe *Pipeline) Process(evt *event.Event) (*event.Event, error) {
 	pipeEvt := &pipelineEvent{data: evt}
 
-	pipeEvts, err := pipe.process(pipeEvt)
-	if err != nil {
+	if err := pipe.process(pipeEvt); err != nil {
 		return nil, err
 	}
 
-	var out []*event.Event
-	for _, evt := range pipeEvts {
-		if !evt.dropped {
-			out = append(out, evt.data)
-		}
+	if pipeEvt.dropped {
+		return nil, nil
 	}
 
-	return out, nil
+	return pipeEvt.data, nil
 }
 
 // TODO: There might need to be an internal and external facing interface.
 // Outside users will have an event.Event while internally we will pass
 // a processor.Event that allow the additional of metadata and an explicit
 // drop method.
-func (pipe *Pipeline) process(evt *pipelineEvent) ([]*pipelineEvent, error) {
+func (pipe *Pipeline) process(evt *pipelineEvent) error {
 	var err error
 	for _, proc := range pipe.processors {
-		var splitEvents []*pipelineEvent
-		splitEvents, err = proc.Process(evt)
-		if err != nil {
-			// OnFailure
+		if err = proc.Process(evt); err != nil {
+			// Go to global on_failure handler.
 			break
 		}
-		_ = splitEvents
 	}
 
 	if err != nil && len(pipe.onFailure) > 0 {
 		for _, proc := range pipe.onFailure {
-			var splitEvents []*pipelineEvent
-			splitEvents, err = proc.Process(evt)
-			if err != nil {
-				return nil, err
+			if err = proc.Process(evt); err != nil {
+				// Failure in global on_failure.
+				return err
 			}
-			_ = splitEvents
 		}
 	}
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return []*pipelineEvent{evt}, nil
+	return nil
 }

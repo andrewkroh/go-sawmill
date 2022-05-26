@@ -1,125 +1,128 @@
 [
   {
     "Index": 0,
-    "Events": [
-      {
-        "event": {
-          "kind": "pipeline_error"
-        }
+    "event": {
+      "event": {
+        "kind": "pipeline_error"
+      },
+      "user": {
+        "id": "UNKNOWN"
       }
-    ]
+    }
   },
   {
     "Index": 1,
-    "Events": [
-      {
-        "event": {
-          "kind": "pipeline_error"
-        },
-        "tmp": {
-          "user_email": "hello@example.com"
-        },
-        "user": {
-          "email": "hello@example.com",
-          "id": "UNKNOWN"
-        }
+    "event": {
+      "event": {
+        "kind": "pipeline_error"
+      },
+      "tmp": {
+        "user_email": "hello@example.com"
+      },
+      "user": {
+        "email": "hello@example.com",
+        "id": "UNKNOWN"
       }
-    ]
+    }
   },
   {
     "Index": 2,
-    "Events": [
-      {
-        "event": {
-          "kind": "pipeline_error"
-        },
-        "tmp": {
-          "user_email": 1111
-        }
+    "event": {
+      "event": {
+        "kind": "pipeline_error"
+      },
+      "tmp": {
+        "user_email": 1111
       }
-    ]
+    }
   },
   {
     "Index": 3,
-    "Events": [
-      {
-        "event": {
-          "kind": "pipeline_error"
-        },
-        "tmp": {
-          "user_id": "id-2222"
-        }
+    "event": {
+      "event": {
+        "kind": "pipeline_error"
+      },
+      "tmp": {
+        "user_id": "id-2222"
+      },
+      "user": {
+        "id": "id-2222"
       }
-    ]
+    }
   },
   {
     "Index": 4,
-    "Events": [
-      {
-        "event": {
-          "kind": "pipeline_error"
-        },
-        "tmp": {
-          "user_id": 2222
-        }
+    "event": {
+      "event": {
+        "kind": "pipeline_error"
+      },
+      "tmp": {
+        "user_id": 2222
+      },
+      "user": {
+        "id": "UNKNOWN"
       }
-    ]
+    }
   },
   {
     "Index": 5,
-    "Events": [
-      {
-        "event": {
-          "kind": "pipeline_error"
-        },
-        "tmp": {
-          "user_roles": [
-            "ADMIN",
-            "MANAGER"
-          ]
-        }
+    "event": {
+      "event": {
+        "kind": "pipeline_error"
+      },
+      "tmp": {
+        "user_roles": [
+          "ADMIN",
+          "MANAGER"
+        ]
+      },
+      "user": {
+        "id": "UNKNOWN"
       }
-    ]
+    }
   },
   {
     "Index": 6,
-    "Events": [
-      {
-        "event": {
-          "kind": "pipeline_error"
-        },
-        "tmp": {
-          "user_roles": [
-            3333
-          ]
-        }
+    "event": {
+      "event": {
+        "kind": "pipeline_error"
+      },
+      "tmp": {
+        "user_roles": [
+          3333
+        ]
+      },
+      "user": {
+        "id": "UNKNOWN"
       }
-    ]
+    }
   },
   {
     "Index": 7,
-    "Events": [
-      {
-        "event": {
-          "kind": "pipeline_error"
-        },
-        "tmp": {
-          "id": "my-id"
-        }
+    "event": {
+      "event": {
+        "kind": "pipeline_error"
+      },
+      "tmp": {
+        "id": "my-id"
+      },
+      "user": {
+        "id": "UNKNOWN"
       }
-    ]
+    }
   },
   {
     "Index": 8,
-    "Events": [
-      {
-        "event": {
-          "kind": "pipeline_error"
-        },
-        "tmp": {
-          "user_hash": "AABB1133FFEECC"
-        }
+    "event": {
+      "event": {
+        "kind": "pipeline_error"
+      },
+      "tmp": {
+        "user_hash": "AABB1133FFEECC"
+      },
+      "user": {
+        "id": "UNKNOWN"
       }
-    ]
+    }
   }
 ]

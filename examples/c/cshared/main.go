@@ -46,7 +46,7 @@ func Process(input *C.char) *C.char {
 		return C.CString(err.Error())
 	}
 
-	data, err := json.Marshal(out[0])
+	data, err := json.Marshal(out)
 	if err != nil {
 		return C.CString(err.Error())
 	}

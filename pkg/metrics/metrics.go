@@ -8,9 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-var (
-	reg *prometheus.Registry
-)
+var reg *prometheus.Registry
 
 func init() {
 	reg = prometheus.NewRegistry()
@@ -27,7 +25,6 @@ func Register(c ...prometheus.Collector) {
 }
 
 func UnregisterPipeline() {
-
 }
 
 func Listen() {

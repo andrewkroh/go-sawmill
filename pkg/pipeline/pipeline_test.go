@@ -5,14 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/andrewkroh/go-event-pipeline/pkg/util"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
@@ -20,11 +17,16 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/andrewkroh/go-event-pipeline/pkg/event"
+	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
+	"github.com/andrewkroh/go-event-pipeline/pkg/processor/registry"
 
 	// Register processors for testing purposes.
+	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/append"
 	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/lowercase"
 	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/set"
 )
+
+var generateExpected = flag.Bool("g", false, "generate expected output")
 
 const sampleConfigYAML = `
 ---
@@ -74,7 +76,7 @@ func samplePipeline() Config {
 Incoming data must follow RFC123 or else!`,
 		Processors: []ProcessorConfig{
 			{
-				"set": ProcessorOptionConfig{
+				"set": &ProcessorOptionConfig{
 					Config: map[string]interface{}{
 						"target_field": "event.id",
 						"value":        "1234",
@@ -84,7 +86,7 @@ Incoming data must follow RFC123 or else!`,
 		},
 		OnFailure: []ProcessorConfig{
 			{
-				"set": ProcessorOptionConfig{
+				"set": &ProcessorOptionConfig{
 					Config: map[string]interface{}{
 						"target_field": "event.kind",
 						"value":        "pipeline_error",
@@ -93,6 +95,30 @@ Incoming data must follow RFC123 or else!`,
 			},
 		},
 	}
+}
+
+type failProcessor struct {
+	config failConfig
+}
+
+type failConfig struct {
+	IgnoreFailure bool `config:"ignore_failure"`
+}
+
+func (f *failProcessor) Process(event processor.Event) error {
+	return errors.New("fail processor failed")
+}
+
+func (f *failProcessor) Config() failConfig {
+	return f.config
+}
+
+var _ processor.Processor = (*failProcessor)(nil)
+
+func init() {
+	registry.MustRegister("fail", func(c failConfig) (*failProcessor, error) {
+		return &failProcessor{config: c}, nil
+	})
 }
 
 func TestPipelineConfigYAMLUnmarshal(t *testing.T) {
@@ -146,12 +172,10 @@ func TestPipeline(t *testing.T) {
 		pipe, err := New(samplePipeline())
 		require.NoError(t, err)
 
-		evts, err := pipe.Process(newTestEvent())
+		evt, err := pipe.Process(newTestEvent())
 		require.NoError(t, err)
-		require.Len(t, evts, 1)
 
-		out := evts[0]
-		eventId := out.Get("event.id")
+		eventId := evt.Get("event.id")
 		require.NotNil(t, eventId)
 		assert.Equal(t, "1234", eventId.String)
 	})
@@ -161,7 +185,7 @@ func TestPipeline(t *testing.T) {
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
 				{
-					"lowercase": ProcessorOptionConfig{
+					"lowercase": &ProcessorOptionConfig{
 						Config: map[string]interface{}{
 							"field": "non_existent",
 						},
@@ -172,9 +196,9 @@ func TestPipeline(t *testing.T) {
 		pipe, err := New(pipeline)
 		require.NoError(t, err)
 
-		evts, err := pipe.Process(newTestEvent())
+		evt, err := pipe.Process(newTestEvent())
 		require.Error(t, err)
-		require.Nil(t, evts)
+		require.Nil(t, evt)
 
 		assert.Contains(t, err.Error(), "non_existent")
 	})
@@ -184,13 +208,13 @@ func TestPipeline(t *testing.T) {
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
 				{
-					"lowercase": ProcessorOptionConfig{
+					"lowercase": &ProcessorOptionConfig{
 						Config: map[string]interface{}{
 							"field": "non_existent",
 						},
 						OnFailure: []ProcessorConfig{
 							{
-								"set": ProcessorOptionConfig{
+								"set": &ProcessorOptionConfig{
 									Config: map[string]interface{}{
 										"target_field": "event.kind",
 										"value":        "pipeline_error",
@@ -205,12 +229,10 @@ func TestPipeline(t *testing.T) {
 		pipe, err := New(pipeline)
 		require.NoError(t, err)
 
-		evts, err := pipe.Process(newTestEvent())
+		evt, err := pipe.Process(newTestEvent())
 		require.NoError(t, err)
-		require.Len(t, evts, 1)
 
-		out := evts[0]
-		kind := out.Get("event.kind")
+		kind := evt.Get("event.kind")
 		require.NotNil(t, kind)
 		assert.Equal(t, "pipeline_error", kind.String)
 	})
@@ -220,7 +242,7 @@ func TestPipeline(t *testing.T) {
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
 				{
-					"lowercase": ProcessorOptionConfig{
+					"lowercase": &ProcessorOptionConfig{
 						Config: map[string]interface{}{
 							"field": "non_existent",
 						},
@@ -229,7 +251,7 @@ func TestPipeline(t *testing.T) {
 			},
 			OnFailure: []ProcessorConfig{
 				{
-					"set": ProcessorOptionConfig{
+					"set": &ProcessorOptionConfig{
 						Config: map[string]interface{}{
 							"target_field": "event.kind",
 							"value":        "pipeline_error",
@@ -241,12 +263,10 @@ func TestPipeline(t *testing.T) {
 		pipe, err := New(pipeline)
 		require.NoError(t, err)
 
-		evts, err := pipe.Process(newTestEvent())
+		evt, err := pipe.Process(newTestEvent())
 		require.NoError(t, err)
-		require.Len(t, evts, 1)
 
-		out := evts[0]
-		kind := out.Get("event.kind")
+		kind := evt.Get("event.kind")
 		require.NotNil(t, kind)
 		assert.Equal(t, "pipeline_error", kind.String)
 	})
@@ -256,7 +276,7 @@ func TestPipeline(t *testing.T) {
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
 				{
-					"lowercase": ProcessorOptionConfig{
+					"lowercase": &ProcessorOptionConfig{
 						Config: map[string]interface{}{
 							"field": "non_existent",
 						},
@@ -311,14 +331,14 @@ func TestPipelines(t *testing.T) {
 			require.NoError(t, err)
 
 			type outputEvent struct {
-				Index  int
-				Events []*event.Event
-				Error  string `json:"error,omitempty"`
+				Index int
+				Event *event.Event `json:"event,omitempty"`
+				Error string       `json:"error,omitempty"`
 			}
 			outputs := make([]outputEvent, 0, len(events))
 			for i, evt := range events {
 				oe := outputEvent{Index: i}
-				oe.Events, err = pipe.Process(evt)
+				oe.Event, err = pipe.Process(evt)
 				if err != nil {
 					oe.Error = err.Error()
 				}
@@ -334,7 +354,7 @@ func TestPipelines(t *testing.T) {
 			actualJSON := buf.Bytes()
 
 			if *generateExpected {
-				err = ioutil.WriteFile(prefix+".events-expected.json", buf.Bytes(), 0644)
+				err = ioutil.WriteFile(prefix+".events-expected.json", buf.Bytes(), 0o644)
 				require.NoError(t, err)
 			}
 
@@ -349,293 +369,5 @@ func TestPipelines(t *testing.T) {
 				t.Fatalf("Found differences:\n%s", diff)
 			}
 		})
-	}
-}
-
-var generateExpected = flag.Bool("g", false, "generate expected output")
-
-func TestExecute(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-
-		pipeline := pipe{
-			id: "root",
-			procs: []pipe{
-				{
-					id: "A",
-				},
-				{
-					id: "B",
-				},
-				{
-					id: "C",
-				},
-				{
-					id: "D",
-					fail: []pipe{
-						{
-							id: "D1",
-						},
-						{
-							id: "D2",
-						},
-					},
-				},
-				{
-					id: "E",
-				},
-			},
-			fail: []pipe{
-				{
-					id: "F",
-				},
-			},
-		}
-
-		rootProc := pipelineToGraph(&pipeline)
-		assert.Equal(t, "A", rootProc.next.id)
-		assert.Equal(t, "B", rootProc.next.next.id)
-		assert.Equal(t, "C", rootProc.next.next.next.id)
-		assert.Equal(t, "D", rootProc.next.next.next.next.id)
-		assert.Equal(t, "D1", rootProc.next.next.next.next.fail.id)
-		assert.Equal(t, "D2", rootProc.next.next.next.next.fail.next.id)
-		assert.Equal(t, "E", rootProc.next.next.next.next.next.id)
-		assert.Equal(t, "F", rootProc.fail.id)
-
-		fmt.Println(graphToString(rootProc))
-
-		out, err := execute(newTestEvent(), rootProc)
-		if assert.NoError(t, err) {
-			fmt.Println()
-			for i, e := range out {
-				j, _ := e.MarshalJSON()
-				assert.Contains(t, string(j), `"root","A","B","C","D","E"`)
-				fmt.Printf("%d: %v", i, string(j))
-			}
-			fmt.Println()
-		}
-	})
-
-	t.Run("global-on_failure", func(t *testing.T) {
-		pipeline := pipe{
-			id: "root",
-			procs: []pipe{
-				{
-					id: "A",
-				},
-				{
-					id: "B-fail",
-					fail: []pipe{
-						{
-							id: "C-fail",
-						},
-					},
-				},
-			},
-			fail: []pipe{
-				{
-					id: "D",
-				},
-			},
-		}
-
-		p := pipelineToGraph(&pipeline)
-		fmt.Println(graphToString(p))
-
-		out, err := execute(newTestEvent(), p)
-		if assert.NoError(t, err) {
-			fmt.Println()
-			for i, e := range out {
-				j, _ := e.MarshalJSON()
-				assert.Contains(t, string(j), `"root","A","B-fail","C-fail","D"`)
-				fmt.Printf("%d: %v", i, string(j))
-			}
-			fmt.Println()
-		}
-	})
-
-	t.Run("branching failures", func(t *testing.T) {
-		root := makeNode("root", nil)
-		a := makeNode("A", root)
-		b := makeNode("B-fail", a)
-		b.fail = makeNode("B.1", nil)
-		fail2 := makeNode("B.2-fail", b.fail)
-		fail2.fail = makeNode("B.2.1", nil)
-
-		_ = makeNode("C", b)
-
-		fmt.Println(graphToString(root))
-
-		out, err := execute(newTestEvent(), root)
-		if assert.NoError(t, err) {
-			fmt.Println()
-			for i, e := range out {
-				j, _ := e.MarshalJSON()
-				assert.Contains(t, string(j), `"root","A","B-fail","B.1","B.2-fail","B.2.1","C"`)
-				fmt.Printf("%d: %v", i, string(j))
-			}
-			fmt.Println()
-		}
-	})
-}
-
-func graphToString(p *proc) string {
-	var sb strings.Builder
-	addGraphNode(p, 0, &sb)
-	return sb.String()
-}
-
-func addGraphNode(p *proc, indent int, sb *strings.Builder) {
-	sb.WriteString(strings.Repeat(" ", indent))
-	sb.WriteString(p.id)
-	sb.WriteByte('\n')
-	if p.fail != nil {
-		sb.WriteString(strings.Repeat(" ", indent))
-		sb.WriteString("|--\n")
-		addGraphNode(p.fail, indent+2, sb)
-	}
-	if p.next != nil {
-		addGraphNode(p.next, indent, sb)
-	}
-}
-
-func pipelineToGraph(pipe *pipe) *proc {
-	return &proc{
-		id:   pipe.id,
-		do:   makeDo(pipe.id),
-		next: pipelineProcsToGraph(pipe.procs),
-		fail: pipelineProcsToGraph(pipe.fail),
-	}
-}
-
-func pipelineProcsToGraph(pipes []pipe) *proc {
-	var list []*proc
-	for _, p := range pipes {
-		list = append(list, pipelineToGraph(&p))
-	}
-	if len(list) == 0 {
-		return nil
-	}
-	item := list[0]
-	for _, pr := range list[1:] {
-		item.next = pr
-		item = pr
-	}
-	return list[0]
-}
-
-func makeNode(name string, parent *proc) *proc {
-	n := &proc{
-		id: name,
-		do: makeDo(name),
-	}
-	if parent != nil {
-		parent.next = n
-	}
-	return n
-}
-
-func makeDo(name string) func(event *event.Event) ([]*event.Event, error) {
-	return func(evt *event.Event) ([]*event.Event, error) {
-		//fmt.Printf("%s->", name)
-		util.Append(evt, "path", event.String(name))
-		if strings.Contains(name, "fail") {
-			return nil, fmt.Errorf("failed in %s", name)
-		}
-		return []*event.Event{evt}, nil
-	}
-}
-
-type pipe struct {
-	id    string
-	procs []pipe
-	fail  []pipe
-}
-
-type proc struct {
-	id   string
-	do   func(event *event.Event) ([]*event.Event, error)
-	next *proc
-	fail *proc
-}
-
-func execute(evt *event.Event, p *proc) ([]*event.Event, error) {
-	stack := &stack{}
-	if p.fail != nil {
-		stack.Push(p.fail)
-	}
-	stack.Push(p)
-	return executeStack(evt, stack)
-}
-
-func executeStack(evt *event.Event, stack *stack) ([]*event.Event, error) {
-	for stack.Len() > 0 {
-		x := stack.Pop()
-
-		if x.next != nil {
-			stack.Push(x.next)
-		}
-
-		out, err := x.do(evt)
-		if err != nil {
-			if x.fail != nil {
-				stack.Push(x.fail)
-				continue
-			}
-			fmt.Println(len(stack.data))
-			for _, node := range stack.data {
-				fmt.Println(node.id, node.fail != nil)
-			}
-			return nil, err
-		}
-
-		switch {
-		case len(out) > 1:
-			// Process each event individually from here.
-			var accumulate []*event.Event
-			for _, evt := range out {
-				splitOut, err := executeStack(evt, stack.Clone())
-				if err != nil {
-					return nil, err
-				}
-				accumulate = append(accumulate, splitOut...)
-			}
-			return accumulate, nil
-		case len(out) == 1:
-			evt = out[0]
-		case len(out) == 0:
-			return nil, nil
-		}
-	}
-
-	return []*event.Event{evt}, nil
-}
-
-type stack struct {
-	data []*proc
-}
-
-func (s *stack) Push(p *proc) {
-	s.data = append(s.data, p)
-}
-
-func (s *stack) Pop() *proc {
-	size := len(s.data)
-	if size == 0 {
-		return nil
-	}
-	item := s.data[size-1]
-	s.data = s.data[:size-1]
-	return item
-}
-
-func (s *stack) Len() int {
-	return len(s.data)
-}
-
-func (s *stack) Clone() *stack {
-	data := make([]*proc, len(s.data))
-	copy(data, s.data)
-	return &stack{
-		data: data,
 	}
 }

@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -13,10 +14,10 @@ import (
 
 type pipelineProcessor struct {
 	ID            string
-	Condition     string
+	Condition     string // TODO: Not implemented.
 	IgnoreFailure bool
 	IgnoreMissing bool
-	process       func(event *pipelineEvent) ([]*pipelineEvent, error)
+	process       func(event *pipelineEvent) error
 	OnFailure     []*pipelineProcessor
 
 	// Metrics
@@ -25,23 +26,31 @@ type pipelineProcessor struct {
 	eventsDropped prometheus.Counter
 }
 
-func (p *pipelineProcessor) Process(event *pipelineEvent) ([]*pipelineEvent, error) {
-	// TODO: Check the type of processor (single vs split).
-	_, err := p.process(event)
+func (p *pipelineProcessor) Process(event *pipelineEvent) error {
+	// TODO: Check Condition before executing.
 
+	err := p.process(event)
+
+	// Ignore Missing
+	if err != nil && p.IgnoreMissing && errors.Is(err, processor.ErrorKeyMissing{}) {
+		return nil
+	}
+
+	// On Failure
 	if err != nil && len(p.OnFailure) > 0 {
 		for _, proc := range p.OnFailure {
-			if _, err = proc.process(event); err != nil {
+			if err = proc.process(event); err != nil {
 				break
 			}
 		}
 	}
 
-	if err != nil {
-		return nil, err
+	// Ignore Failure
+	if err != nil && !p.IgnoreFailure {
+		return err
 	}
 
-	return []*pipelineEvent{event}, nil
+	return nil
 }
 
 func newPipelineProcessors(baseID string, procConfigs []ProcessorConfig) ([]*pipelineProcessor, error) {
@@ -67,8 +76,8 @@ func newPipelineProcessors(baseID string, procConfigs []ProcessorConfig) ([]*pip
 	return processors, nil
 }
 
-func newPipelineProcessor(baseID string, processorIndex int, processorType string, config ProcessorOptionConfig) (*pipelineProcessor, error) {
-	// Psuedo JSON XPath expression.
+func newPipelineProcessor(baseID string, processorIndex int, processorType string, config *ProcessorOptionConfig) (*pipelineProcessor, error) {
+	// Pseudo JSON XPath expression.
 	id := baseID + "[" + strconv.Itoa(processorIndex) + "]." + processorType
 
 	labels := map[string]string{
@@ -81,6 +90,7 @@ func newPipelineProcessor(baseID string, processorIndex int, processorType strin
 	if err != nil {
 		return nil, err
 	}
+	// TODO: Change the interface to return a processor since splitProcessor is removed.
 	proc := procIfc.(processor.Processor)
 
 	ignoreMissingPtr, ignoreFailurePtr, err := ignores(procIfc)
@@ -96,11 +106,11 @@ func newPipelineProcessor(baseID string, processorIndex int, processorType strin
 	p := &pipelineProcessor{
 		ID:        id,
 		Condition: string(config.If),
-		process: func(event *pipelineEvent) ([]*pipelineEvent, error) {
+		process: func(event *pipelineEvent) error {
 			if err := proc.Process(event); err != nil {
-				return nil, err
+				return err
 			}
-			return []*pipelineEvent{event}, nil
+			return nil
 		},
 		OnFailure: onFailureProcessors,
 		eventsIn: prometheus.NewCounter(prometheus.CounterOpts{
@@ -109,14 +119,12 @@ func newPipelineProcessor(baseID string, processorIndex int, processorType strin
 			Help:        "Total number of events in to component.",
 			ConstLabels: labels,
 		}),
-
 		eventsOut: prometheus.NewCounter(prometheus.CounterOpts{
 			Namespace:   "es",
 			Name:        "component_events_out_total",
 			Help:        "Total number of events out of component.",
 			ConstLabels: labels,
 		}),
-
 		eventsDropped: prometheus.NewCounter(prometheus.CounterOpts{
 			Namespace:   "es",
 			Name:        "component_events_dropped_total",

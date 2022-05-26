@@ -15,8 +15,11 @@ import (
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = fmt.Errorf
-var _ = math.Inf
+
+var (
+	_ = fmt.Errorf
+	_ = math.Inf
+)
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -64,9 +67,11 @@ func (*MessageWrapper) ProtoMessage()    {}
 func (*MessageWrapper) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2d17a9d3f0ddf27e, []int{0}
 }
+
 func (m *MessageWrapper) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *MessageWrapper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MessageWrapper.Marshal(b, m, deterministic)
@@ -79,12 +84,15 @@ func (m *MessageWrapper) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
+
 func (m *MessageWrapper) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MessageWrapper.Merge(m, src)
 }
+
 func (m *MessageWrapper) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *MessageWrapper) XXX_DiscardUnknown() {
 	xxx_messageInfo_MessageWrapper.DiscardUnknown(m)
 }
@@ -137,9 +145,11 @@ func (*Log) ProtoMessage()    {}
 func (*Log) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2d17a9d3f0ddf27e, []int{1}
 }
+
 func (m *Log) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *Log) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Log.Marshal(b, m, deterministic)
@@ -152,12 +162,15 @@ func (m *Log) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *Log) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Log.Merge(m, src)
 }
+
 func (m *Log) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *Log) XXX_DiscardUnknown() {
 	xxx_messageInfo_Log.DiscardUnknown(m)
 }
@@ -194,9 +207,11 @@ func (*Value) ProtoMessage()    {}
 func (*Value) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2d17a9d3f0ddf27e, []int{2}
 }
+
 func (m *Value) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *Value) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Value.Marshal(b, m, deterministic)
@@ -209,12 +224,15 @@ func (m *Value) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *Value) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Value.Merge(m, src)
 }
+
 func (m *Value) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *Value) XXX_DiscardUnknown() {
 	xxx_messageInfo_Value.DiscardUnknown(m)
 }
@@ -363,9 +381,11 @@ func (*ValueArray) ProtoMessage()    {}
 func (*ValueArray) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2d17a9d3f0ddf27e, []int{3}
 }
+
 func (m *ValueArray) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *ValueArray) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_ValueArray.Marshal(b, m, deterministic)
@@ -378,12 +398,15 @@ func (m *ValueArray) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
+
 func (m *ValueArray) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ValueArray.Merge(m, src)
 }
+
 func (m *ValueArray) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *ValueArray) XXX_DiscardUnknown() {
 	xxx_messageInfo_ValueArray.DiscardUnknown(m)
 }
@@ -410,9 +433,11 @@ func (*ValueObject) ProtoMessage()    {}
 func (*ValueObject) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2d17a9d3f0ddf27e, []int{4}
 }
+
 func (m *ValueObject) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
+
 func (m *ValueObject) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_ValueObject.Marshal(b, m, deterministic)
@@ -425,12 +450,15 @@ func (m *ValueObject) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
+
 func (m *ValueObject) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ValueObject.Merge(m, src)
 }
+
 func (m *ValueObject) XXX_Size() int {
 	return m.Size()
 }
+
 func (m *ValueObject) XXX_DiscardUnknown() {
 	xxx_messageInfo_ValueObject.DiscardUnknown(m)
 }
@@ -546,6 +574,7 @@ func (m *MessageWrapper_Log) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *Log) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -633,6 +662,7 @@ func (m *Value_Null) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	dAtA[i] = 0x8
 	return len(dAtA) - i, nil
 }
+
 func (m *Value_Array) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -654,6 +684,7 @@ func (m *Value_Array) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *Value_Boolean) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -671,6 +702,7 @@ func (m *Value_Boolean) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	dAtA[i] = 0x18
 	return len(dAtA) - i, nil
 }
+
 func (m *Value_Float) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -684,6 +716,7 @@ func (m *Value_Float) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	dAtA[i] = 0x21
 	return len(dAtA) - i, nil
 }
+
 func (m *Value_Integer) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -696,6 +729,7 @@ func (m *Value_Integer) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	dAtA[i] = 0x28
 	return len(dAtA) - i, nil
 }
+
 func (m *Value_Object) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -717,6 +751,7 @@ func (m *Value_Object) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *Value_String_) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -733,6 +768,7 @@ func (m *Value_String_) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+
 func (m *Value_Timestamp) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -745,6 +781,7 @@ func (m *Value_Timestamp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	dAtA[i] = 0x40
 	return len(dAtA) - i, nil
 }
+
 func (m *Value_UnsignedInteger) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -757,6 +794,7 @@ func (m *Value_UnsignedInteger) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	dAtA[i] = 0x48
 	return len(dAtA) - i, nil
 }
+
 func (m *ValueArray) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -862,6 +900,7 @@ func encodeVarintEvent(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+
 func (m *MessageWrapper) Size() (n int) {
 	if m == nil {
 		return 0
@@ -889,6 +928,7 @@ func (m *MessageWrapper_Log) Size() (n int) {
 	}
 	return n
 }
+
 func (m *Log) Size() (n int) {
 	if m == nil {
 		return 0
@@ -929,6 +969,7 @@ func (m *Value_Null) Size() (n int) {
 	n += 1 + sovEvent(uint64(m.Null))
 	return n
 }
+
 func (m *Value_Array) Size() (n int) {
 	if m == nil {
 		return 0
@@ -941,6 +982,7 @@ func (m *Value_Array) Size() (n int) {
 	}
 	return n
 }
+
 func (m *Value_Boolean) Size() (n int) {
 	if m == nil {
 		return 0
@@ -950,6 +992,7 @@ func (m *Value_Boolean) Size() (n int) {
 	n += 2
 	return n
 }
+
 func (m *Value_Float) Size() (n int) {
 	if m == nil {
 		return 0
@@ -959,6 +1002,7 @@ func (m *Value_Float) Size() (n int) {
 	n += 9
 	return n
 }
+
 func (m *Value_Integer) Size() (n int) {
 	if m == nil {
 		return 0
@@ -968,6 +1012,7 @@ func (m *Value_Integer) Size() (n int) {
 	n += 1 + sovEvent(uint64(m.Integer))
 	return n
 }
+
 func (m *Value_Object) Size() (n int) {
 	if m == nil {
 		return 0
@@ -980,6 +1025,7 @@ func (m *Value_Object) Size() (n int) {
 	}
 	return n
 }
+
 func (m *Value_String_) Size() (n int) {
 	if m == nil {
 		return 0
@@ -992,6 +1038,7 @@ func (m *Value_String_) Size() (n int) {
 	}
 	return n
 }
+
 func (m *Value_Timestamp) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1001,6 +1048,7 @@ func (m *Value_Timestamp) Size() (n int) {
 	n += 1 + sovEvent(uint64(m.Timestamp))
 	return n
 }
+
 func (m *Value_UnsignedInteger) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1010,6 +1058,7 @@ func (m *Value_UnsignedInteger) Size() (n int) {
 	n += 1 + sovEvent(uint64(m.UnsignedInteger))
 	return n
 }
+
 func (m *ValueArray) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1056,9 +1105,11 @@ func (m *ValueObject) Size() (n int) {
 func sovEvent(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
+
 func sozEvent(x uint64) (n int) {
 	return sovEvent(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
+
 func (m *MessageWrapper) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1145,6 +1196,7 @@ func (m *MessageWrapper) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *Log) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1232,6 +1284,7 @@ func (m *Log) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *Value) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1498,6 +1551,7 @@ func (m *Value) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *ValueArray) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1583,6 +1637,7 @@ func (m *ValueArray) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func (m *ValueObject) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1763,6 +1818,7 @@ func (m *ValueObject) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+
 func skipEvent(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0

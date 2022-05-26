@@ -14,18 +14,24 @@ type Config struct {
 	OnFailure   []ProcessorConfig `yaml:"on_failure,omitempty"  json:"on_failure,omitempty"`
 }
 
-type ProcessorConfig map[string]ProcessorOptionConfig
+type ProcessorConfig map[string]*ProcessorOptionConfig
 
-func (c ProcessorConfig) getProcessor() (name string, opts ProcessorOptionConfig, err error) {
-	if len(c) != 1 {
-		return "", ProcessorOptionConfig{}, errors.New("exactly one processor must be specified")
+func (c ProcessorConfig) getProcessor() (name string, opts *ProcessorOptionConfig, err error) {
+	if len(c) == 0 {
+		return "", nil, errors.New("processor cannot be empty")
+	}
+	if len(c) > 1 {
+		return "", nil, errors.New("only one processor must be specified")
 	}
 	for k, v := range c {
+		if v == nil {
+			v = &ProcessorOptionConfig{}
+		}
 		return k, v, nil
 	}
 
 	// Never invoked.
-	return "", ProcessorOptionConfig{}, nil
+	return "", nil, nil
 }
 
 type ProcessorOptionConfig struct {

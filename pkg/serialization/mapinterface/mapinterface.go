@@ -18,9 +18,7 @@ func (e *UnsupportedTypeError) Error() string {
 	return "mapinterface: unsupported type: " + e.Type.String()
 }
 
-var (
-	TagName = "event"
-)
+var TagName = "event"
 
 var (
 	errorInterface = reflect.TypeOf((*error)(nil)).Elem()

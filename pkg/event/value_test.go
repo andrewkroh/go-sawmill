@@ -19,7 +19,7 @@ func TestValueTypeString(t *testing.T) {
 }
 
 func TestValueString(t *testing.T) {
-	var testCases = []struct {
+	testCases := []struct {
 		Value  *Value
 		String string
 	}{

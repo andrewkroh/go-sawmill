@@ -1,0 +1,37 @@
+---
+
+id: global-on-failure
+description: >
+  This test verifies the execution path of the pipeline when failures are
+  involved.
+processors:
+  - append:
+      id: append-A
+      field: path
+      value: A
+  - fail:
+      ignore_failure: true
+      on_failure:
+        - append:
+            id: append-B
+            field: path
+            value: B
+        - fail:
+        - append:
+            id: append-NOT_EXECUTED_1
+            field: path
+            value: NOT_EXECUTED_1
+  - append:
+      id: append-C
+      field: path
+      value: C
+  - fail:
+  - append:
+      id: append-NOT_EXECUTED_2
+      field: path
+      value: NOT_EXECUTED_2
+on_failure:
+  - append:
+      id: append-D
+      field: path
+      value: D
