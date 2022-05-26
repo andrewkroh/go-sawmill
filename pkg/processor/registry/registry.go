@@ -10,9 +10,8 @@ import (
 )
 
 var (
-	errorInterface          = reflect.TypeOf((*error)(nil)).Elem()
-	processorInterface      = reflect.TypeOf((*processor.Processor)(nil)).Elem()
-	splitProcessorInterface = reflect.TypeOf((*processor.SplitProcessor)(nil)).Elem()
+	errorInterface     = reflect.TypeOf((*error)(nil)).Elem()
+	processorInterface = reflect.TypeOf((*processor.Processor)(nil)).Elem()
 )
 
 var constructors = NewRegistry()
@@ -102,8 +101,8 @@ func validateConfig(i interface{}) (*processorConstructor, error) {
 	if processorType.Kind() != reflect.Ptr {
 		return nil, fmt.Errorf("function should return a pointer to a processor struct")
 	}
-	if !processorType.Implements(processorInterface) && !processorType.Implements(splitProcessorInterface) {
-		return nil, fmt.Errorf("processor must implement processor.Processor or processor.SplitProcessor")
+	if !processorType.Implements(processorInterface) {
+		return nil, fmt.Errorf("processor must implement processor.Processor")
 	}
 
 	errorType := t.Out(1)

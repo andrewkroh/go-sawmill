@@ -23,7 +23,8 @@ on_failure:
 	require.Len(t, conf.Processors, 2)
 	require.Len(t, conf.OnFailure, 1)
 
-	name, _, err := conf.Processors[0].getProcessor()
+	name, options, err := conf.Processors[0].getProcessor()
 	require.NoError(t, err)
 	assert.Equal(t, "fail", name)
+	assert.NotNil(t, options)
 }

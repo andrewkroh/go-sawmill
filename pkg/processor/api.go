@@ -24,12 +24,6 @@ type Processor interface {
 	Process(event Event) error
 }
 
-type SplitProcessor interface {
-	// Process a single event and possibly return multiple.
-	// TODO: Clarify.
-	Process(event Event) ([]Event, error)
-}
-
 func ConfigString(name string, v interface{}) string {
 	var buf strings.Builder
 	buf.WriteString(name)

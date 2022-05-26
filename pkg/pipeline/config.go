@@ -31,7 +31,7 @@ func (c ProcessorConfig) getProcessor() (name string, opts *ProcessorOptionConfi
 	}
 
 	// Never invoked.
-	return "", nil, nil
+	return "", nil, errors.New("unexpected number of keys in processor")
 }
 
 type ProcessorOptionConfig struct {

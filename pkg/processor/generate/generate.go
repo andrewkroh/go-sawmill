@@ -1,10 +1,31 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package main
 
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
+	"flag"
 	"fmt"
+	"go/ast"
+	"go/format"
+	"go/parser"
+	"go/token"
 	"io/ioutil"
 	"log"
 	"os"
@@ -19,50 +40,75 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var processorsYmlFile string
+
+func init() {
+	flag.StringVar(&processorsYmlFile, "p", "processors.yml", "processors.yml file to use as the source")
+}
+
 func main() {
-	f, err := os.Open("../processors.yml")
+	flag.Parse()
+
+	f, err := os.Open(processorsYmlFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
 
+	// Decode the processors.yml and validate all fields are known.
 	dec := yaml.NewDecoder(bufio.NewReader(f))
-	// dec.KnownFields(true)
-	// var i map[interface{}]interface{}
+	dec.KnownFields(true)
 	var p Processors
 	if err := dec.Decode(&p); err != nil {
 		log.Fatal(err)
 	}
 
-	// m := cleanMapInterface(i)
-	data, err := json.MarshalIndent(p, "", "  ")
+	// Output generated data to the directory holding the processors.yml file.
+	outputDir, err := filepath.Abs(filepath.Dir(f.Name()))
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Final YAML:\n", string(data))
 
 	for _, p := range p.Processors {
 		for name, data := range p {
+			// Sort config options by name.
 			sort.Slice(data.Configuration, func(i, j int) bool {
 				return data.Configuration[i].Name < data.Configuration[j].Name
 			})
 
+			templateData := ProcessorTemplateVar{
+				License:            apacheLicense,
+				Name:               name,
+				Processor:          data,
+				IncludeProcessFunc: true,
+			}
+
+			outputGoFile := filepath.Join(outputDir, name, name+".go")
+
+			// Check if the existing file has been modified and keep that
+			// modification.
+			hasProcess, err := hasProcessFunc(outputGoFile)
+			if err == nil && !hasProcess {
+				templateData.IncludeProcessFunc = false
+			}
+
+			// Render template.
 			buf := new(bytes.Buffer)
-			err := goFileTemplate.Execute(buf, ProcessorTemplateVar{
-				License:   "// Foo License", // TODO: Add license text.
-				Name:      name,
-				Processor: data,
-			})
+			if err := goFileTemplate.Execute(buf, templateData); err != nil {
+				log.Fatal(err)
+			}
+
+			// gofmt the output.
+			srcBytes, err := format.Source(buf.Bytes())
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			path := filepath.Join("..", name, name+".go")
-			if err = os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			if err = os.MkdirAll(filepath.Dir(outputGoFile), 0o755); err != nil {
 				log.Fatal(err)
 			}
 
-			if err = ioutil.WriteFile(path, buf.Bytes(), 0o644); err != nil {
+			if err = ioutil.WriteFile(outputGoFile, srcBytes, 0o644); err != nil {
 				log.Fatal(err)
 			}
 		}
@@ -70,7 +116,8 @@ func main() {
 }
 
 type Processors struct {
-	Processors []map[string]Processor
+	CommonFields map[string]interface{} `yaml:"common_fields"`
+	Processors   []map[string]Processor
 }
 
 type Processor struct {
@@ -126,7 +173,7 @@ func cleanValue(v interface{}) interface{} {
 }
 
 // descriptionToComment builds a comment string that is wrapped at 80 chars.
-func descriptionToComment(indent, desc string) string {
+func descriptionToComment(indent, desc string) (string, error) {
 	textLength := 80 - len(strings.Replace(indent, "\t", "    ", 4)+" // ")
 	lines := strings.Split(wordwrap.WrapString(desc, uint(textLength)), "\n")
 	if len(lines) > 0 {
@@ -141,21 +188,19 @@ func descriptionToComment(indent, desc string) string {
 			lines = lines[:len(lines)-1]
 		}
 	}
-	for i := 0; i < len(lines); i++ {
-	}
 	return trimTrailingWhitespace(strings.Join(lines, "\n"+indent+"// "))
 }
 
-func trimTrailingWhitespace(text string) string {
+func trimTrailingWhitespace(text string) (string, error) {
 	var lines [][]byte
 	s := bufio.NewScanner(bytes.NewBufferString(text))
 	for s.Scan() {
 		lines = append(lines, bytes.TrimRightFunc(s.Bytes(), unicode.IsSpace))
 	}
 	if err := s.Err(); err != nil {
-		log.Fatal(err)
+		return "", err
 	}
-	return string(bytes.Join(lines, []byte("\n")))
+	return string(bytes.Join(lines, []byte("\n"))), nil
 }
 
 // goDataType returns the Go type to use for Elasticsearch mapping data type.
@@ -223,11 +268,56 @@ func isSeparator(c rune) bool {
 	}
 }
 
+// hasProcessFunc returns true if the file contains a Process function.
+func hasProcessFunc(goFile string) (bool, error) {
+	fset := token.NewFileSet()
+
+	f, err := parser.ParseFile(fset, goFile, nil, parser.ParseComments)
+	if err != nil {
+		return false, err
+	}
+
+	var found bool
+	ast.Inspect(f, func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.FuncDecl:
+			if x.Name.Name == "Process" {
+				found = true
+				return false
+			}
+		}
+		return true
+	})
+
+	return found, nil
+}
+
+// ### Processor Template
+
 var goFileTemplate = template.Must(template.New("type").Funcs(templateFuncs).Parse(
 	strings.Replace(typeTmpl[1:], `\u0060`, "`", -1)))
 
+var apacheLicense = `
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.`[1:]
+
 const typeTmpl = `
 {{.License}}
+
 // Code generated by processor/generate.go - DO NOT EDIT.
 package {{ .Name | to_lower }}
 
@@ -277,9 +367,11 @@ func (p *{{.Name | to_exported_go_type}}) String() string {
 	return processor.ConfigString(processorName, p.config)
 }
 
+{{ if .IncludeProcessFunc }}
 func (p *{{.Name | to_exported_go_type}}) Process(event processor.Event) error {
 	return nil
 }
+{{ end }}
 `
 
 var templateFuncs = template.FuncMap{
@@ -307,7 +399,8 @@ var templateFuncs = template.FuncMap{
 }
 
 type ProcessorTemplateVar struct {
-	License string
-	Name    string
+	License            string
+	Name               string
+	IncludeProcessFunc bool
 	Processor
 }

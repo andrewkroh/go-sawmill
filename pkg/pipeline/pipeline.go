@@ -6,13 +6,6 @@ import (
 	"github.com/andrewkroh/go-event-pipeline/pkg/event"
 )
 
-type Processor interface {
-	Process(event *pipelineEvent) ([]*pipelineEvent, error)
-}
-
-// TODO: Each pipeline should also be usable as a processor within another pipeline.
-// var _ Processor = (*Pipeline)(nil)
-
 type Pipeline struct {
 	id         string
 	processors []*pipelineProcessor
