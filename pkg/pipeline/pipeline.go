@@ -11,7 +11,7 @@ type Processor interface {
 }
 
 // TODO: Each pipeline should also be usable as a processor within another pipeline.
-//var _ Processor = (*Pipeline)(nil)
+// var _ Processor = (*Pipeline)(nil)
 
 type Pipeline struct {
 	id         string
@@ -19,7 +19,7 @@ type Pipeline struct {
 	onFailure  []*pipelineProcessor
 }
 
-func New(config Config) (*Pipeline, error) {
+func New(config *Config) (*Pipeline, error) {
 	if config.ID == "" {
 		return nil, errors.New("pipeline must have a non-empty id")
 	}

@@ -68,8 +68,8 @@ const sampleConfigJSON = `
 }
 `
 
-func samplePipeline() Config {
-	return Config{
+func samplePipeline() *Config {
+	return &Config{
 		ID: "logs-sample",
 		Description: `Parse sample data.
 
@@ -122,7 +122,7 @@ func init() {
 }
 
 func TestPipelineConfigYAMLUnmarshal(t *testing.T) {
-	var p Config
+	var p *Config
 	dec := yaml.NewDecoder(bytes.NewBufferString(sampleConfigYAML))
 	dec.KnownFields(true)
 	require.NoError(t, dec.Decode(&p))
@@ -131,7 +131,7 @@ func TestPipelineConfigYAMLUnmarshal(t *testing.T) {
 }
 
 func TestPipelineConfigJSONUnmarshal(t *testing.T) {
-	var p Config
+	var p *Config
 	dec := json.NewDecoder(bytes.NewBufferString(sampleConfigJSON))
 	dec.DisallowUnknownFields()
 	require.NoError(t, dec.Decode(&p))
@@ -181,7 +181,7 @@ func TestPipeline(t *testing.T) {
 	})
 
 	t.Run("processor err", func(t *testing.T) {
-		pipeline := Config{
+		pipeline := &Config{
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
 				{
@@ -204,7 +204,7 @@ func TestPipeline(t *testing.T) {
 	})
 
 	t.Run("processor err with local on_failure", func(t *testing.T) {
-		pipeline := Config{
+		pipeline := &Config{
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
 				{
@@ -238,7 +238,7 @@ func TestPipeline(t *testing.T) {
 	})
 
 	t.Run("pipeline err with global on_failure", func(t *testing.T) {
-		pipeline := Config{
+		pipeline := &Config{
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
 				{
@@ -272,7 +272,7 @@ func TestPipeline(t *testing.T) {
 	})
 
 	t.Run("pipeline err no global on_failure", func(t *testing.T) {
-		pipeline := Config{
+		pipeline := &Config{
 			ID: "lowercase-non-existent",
 			Processors: []ProcessorConfig{
 				{
@@ -311,7 +311,7 @@ func TestPipelines(t *testing.T) {
 			data, err := ioutil.ReadFile(name)
 			require.NoError(t, err)
 
-			var pipelineConfig Config
+			var pipelineConfig *Config
 			err = yaml.Unmarshal(data, &pipelineConfig)
 			require.NoError(t, err)
 

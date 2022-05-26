@@ -22,7 +22,7 @@ func process(this js.Value, args []js.Value) interface{} {
 	pipelineJSON := args[0].String()
 	eventJSON := args[1].String()
 
-	var pipelineConfig pipeline.Config
+	var pipelineConfig *pipeline.Config
 	if err := json.Unmarshal([]byte(pipelineJSON), &pipelineConfig); err != nil {
 		return "failed to unmarshal pipeline: " + err.Error()
 	}
