@@ -25,11 +25,14 @@ import (
 	"io"
 	"log"
 	"os"
+	"runtime"
+	"runtime/pprof"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/andrewkroh/go-event-pipeline/pkg/event"
+	"github.com/andrewkroh/go-event-pipeline/pkg/metrics"
 	"github.com/andrewkroh/go-event-pipeline/pkg/pipeline"
 
 	// Register processors:
@@ -41,28 +44,58 @@ import (
 	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/uppercase"
 )
 
-var pipelineFile string
+var (
+	pipelineFile      string
+	metricsListenAddr string
+	cpuProfile        string
+	memProfile        string
+)
 
 func init() {
 	flag.StringVar(&pipelineFile, "p", "", "pipeline definition file")
+	flag.StringVar(&metricsListenAddr, "metrics-addr", "localhost:9003", "Metrics listen address.")
+
+	flag.StringVar(&cpuProfile, "cpuprofile", "", "CPU profile output")
+	flag.StringVar(&memProfile, "memprofile", "", "memory profile output")
 }
 
 func main() {
 	log.SetFlags(0)
 	flag.Parse()
 
+	if cpuProfile != "" {
+		bw, flush := bufferedFileWriter(cpuProfile)
+		pprof.StartCPUProfile(bw)
+		defer flush()
+		defer pprof.StopCPUProfile()
+	}
+
+	if memProfile != "" {
+		bw, flush := bufferedFileWriter(memProfile)
+		defer func() {
+			runtime.GC() // materialize all statistics
+			if err := pprof.WriteHeapProfile(bw); err != nil {
+				log.Fatal(err)
+			}
+			flush()
+		}()
+	}
+
 	c, err := loadPipeline(pipelineFile)
 	if err != nil {
 		log.Fatal("Error:", err)
 	}
 
-	// TODO: Consider making New accept a pointer.
 	p, err := pipeline.New(c)
 	if err != nil {
 		log.Fatal("Error:", err)
 	}
 
-	if err := processInput(os.Stdin, p); err != nil {
+	metrics.Register(p.Metrics()...)
+	defer metrics.Unregister(p.Metrics()...)
+	metrics.Listen(metricsListenAddr)
+
+	if err := processInput(os.Stdin, os.Stdout, p); err != nil {
 		log.Fatal("Error:", err)
 	}
 }
@@ -82,9 +115,12 @@ func loadPipeline(path string) (*pipeline.Config, error) {
 	return c, nil
 }
 
-func processInput(in io.Reader, pipe *pipeline.Pipeline) error {
+func processInput(in io.Reader, out io.Writer, pipe *pipeline.Pipeline) error {
 	s := bufio.NewScanner(in)
 	var lineNumber uint64
+
+	enc := json.NewEncoder(out)
+	enc.SetEscapeHTML(false)
 
 	for s.Scan() {
 		lineNumber++
@@ -101,23 +137,36 @@ func processInput(in io.Reader, pipe *pipeline.Pipeline) error {
 		evt.Put("event.original", event.String(line))
 
 		// Process the event.
-		out, err := pipe.Process(evt)
+		evt, err := pipe.Process(evt)
 		if err != nil {
 			log.Printf("Error processing line %d: %v", lineNumber, err)
 			continue
 		}
 
-		data, err := json.Marshal(out)
-		if err != nil {
+		if err := enc.Encode(evt); err != nil {
 			log.Printf("Unexpected error marshaling event from line %d to JSON: %v", lineNumber, err)
 			continue
 		}
-
-		fmt.Println(string(data))
 	}
 	if err := s.Err(); err != nil {
 		return fmt.Errorf("failed reading from input: %w", err)
 	}
 
 	return nil
+}
+
+func bufferedFileWriter(dest string) (w io.Writer, close func()) {
+	f, err := os.Create(dest)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bw := bufio.NewWriter(f)
+	return bw, func() {
+		if err := bw.Flush(); err != nil {
+			log.Fatalf("error flushing %v: %v", dest, err)
+		}
+		if err := f.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}
 }

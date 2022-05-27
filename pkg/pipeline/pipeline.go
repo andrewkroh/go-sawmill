@@ -20,6 +20,8 @@ package pipeline
 import (
 	"errors"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/andrewkroh/go-event-pipeline/pkg/event"
 )
 
@@ -99,4 +101,35 @@ func (pipe *Pipeline) process(evt *pipelineEvent) error {
 	}
 
 	return nil
+}
+
+func (pipe *Pipeline) ID() string {
+	return pipe.id
+}
+
+func (pipe *Pipeline) Metrics() []prometheus.Collector {
+	var metrics []prometheus.Collector
+	pipe.visitProcessors(func(proc *pipelineProcessor) {
+		metrics = append(metrics,
+			proc.metricDiscardedEventsTotal,
+			proc.metricErrorsTotal,
+			proc.metricEventsInTotal,
+			proc.metricEventsOutTotal,
+		)
+	})
+	return metrics
+}
+
+func (pipe *Pipeline) visitProcessors(visit func(processor *pipelineProcessor)) {
+	for _, proc := range pipe.processors {
+		visitProcessor(visit, proc)
+	}
+}
+
+func visitProcessor(visit func(processor *pipelineProcessor), proc *pipelineProcessor) {
+	visit(proc)
+
+	for _, proc := range proc.OnFailure {
+		visitProcessor(visit, proc)
+	}
 }

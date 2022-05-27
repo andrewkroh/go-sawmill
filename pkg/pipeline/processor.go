@@ -34,39 +34,54 @@ type pipelineProcessor struct {
 	Condition     string // TODO: Not implemented.
 	IgnoreFailure bool
 	IgnoreMissing bool
-	process       func(event *pipelineEvent) error
 	OnFailure     []*pipelineProcessor
 
+	proc processor.Processor
+
 	// Metrics
-	eventsIn      prometheus.Counter
-	eventsOut     prometheus.Counter
-	eventsDropped prometheus.Counter
+	metricDiscardedEventsTotal prometheus.Counter // Explicit drops by the processor.
+	metricErrorsTotal          prometheus.Counter // Total errors (not including ignored or recovered errors).
+	metricEventsInTotal        prometheus.Counter // Received events.
+	metricEventsOutTotal       prometheus.Counter // Successfully output events.
 }
 
 func (p *pipelineProcessor) Process(event *pipelineEvent) error {
 	// TODO: Check Condition before executing.
+	p.metricEventsInTotal.Inc()
 
-	err := p.process(event)
+	if err := p.proc.Process(event); err != nil {
+		if event.dropped {
+			p.metricDiscardedEventsTotal.Inc()
+			return nil
+		}
 
-	// Ignore Missing
-	if err != nil && p.IgnoreMissing && errors.Is(err, processor.ErrorKeyMissing{}) {
-		return nil
-	}
+		// Ignore Missing
+		if p.IgnoreMissing && errors.Is(err, processor.ErrorKeyMissing{}) {
+			p.metricEventsOutTotal.Inc()
+			return nil
+		}
 
-	// On Failure
-	if err != nil && len(p.OnFailure) > 0 {
-		for _, proc := range p.OnFailure {
-			if err = proc.process(event); err != nil {
-				break
+		// On Failure
+		if len(p.OnFailure) > 0 {
+			for _, proc := range p.OnFailure {
+				if err = proc.Process(event); err != nil {
+					break
+				}
 			}
 		}
-	}
 
-	// Ignore Failure
-	if err != nil && !p.IgnoreFailure {
+		// Ignore Failure
+		if p.IgnoreFailure && err != nil {
+			p.metricEventsOutTotal.Inc()
+			return nil
+		}
+
+		// Could not recover from the error or ignore it.
+		p.metricErrorsTotal.Inc()
 		return err
 	}
 
+	p.metricEventsOutTotal.Inc()
 	return nil
 }
 
@@ -103,14 +118,12 @@ func newPipelineProcessor(baseID string, processorIndex int, processorType strin
 		"component_id":   id,
 	}
 
-	procIfc, err := registry.NewProcessor(processorType, config.Config)
+	proc, err := registry.NewProcessor(processorType, config.Config)
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Change the interface to return a processor since splitProcessor is removed.
-	proc := procIfc.(processor.Processor)
 
-	ignoreMissingPtr, ignoreFailurePtr, err := ignores(procIfc)
+	ignoreMissingPtr, ignoreFailurePtr, err := ignores(proc)
 	if err != nil {
 		return nil, err
 	}
@@ -123,29 +136,30 @@ func newPipelineProcessor(baseID string, processorIndex int, processorType strin
 	p := &pipelineProcessor{
 		ID:        id,
 		Condition: string(config.If),
-		process: func(event *pipelineEvent) error {
-			if err := proc.Process(event); err != nil {
-				return err
-			}
-			return nil
-		},
 		OnFailure: onFailureProcessors,
-		eventsIn: prometheus.NewCounter(prometheus.CounterOpts{
+		proc:      proc,
+		metricDiscardedEventsTotal: prometheus.NewCounter(prometheus.CounterOpts{
 			Namespace:   "es",
-			Name:        "component_events_in_total",
-			Help:        "Total number of events in to component.",
-			ConstLabels: labels,
-		}),
-		eventsOut: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace:   "es",
-			Name:        "component_events_out_total",
-			Help:        "Total number of events out of component.",
-			ConstLabels: labels,
-		}),
-		eventsDropped: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace:   "es",
-			Name:        "component_events_dropped_total",
+			Name:        "component_discarded_events_total",
 			Help:        "Total number of events dropped by component.",
+			ConstLabels: labels,
+		}),
+		metricErrorsTotal: prometheus.NewCounter(prometheus.CounterOpts{
+			Namespace:   "es",
+			Name:        "component_errors_total",
+			Help:        "Total number of errors by component.",
+			ConstLabels: labels,
+		}),
+		metricEventsInTotal: prometheus.NewCounter(prometheus.CounterOpts{
+			Namespace:   "es",
+			Name:        "component_received_events_total",
+			Help:        "Total number of events received by component.",
+			ConstLabels: labels,
+		}),
+		metricEventsOutTotal: prometheus.NewCounter(prometheus.CounterOpts{
+			Namespace:   "es",
+			Name:        "component_sent_events_total",
+			Help:        "Total number of events sent by component.",
 			ConstLabels: labels,
 		}),
 	}

@@ -25,7 +25,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func TestConfig(t *testing.T) {
+func TestConfigUnmarshal(t *testing.T) {
 	const yml = `
 ---
 processors:

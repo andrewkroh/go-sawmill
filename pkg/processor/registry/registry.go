@@ -39,7 +39,7 @@ func MustRegister(name string, constructorFunc interface{}) {
 	}
 }
 
-func NewProcessor(name string, config map[string]interface{}) (interface{}, error) {
+func NewProcessor(name string, config map[string]interface{}) (processor.Processor, error) {
 	return constructors.NewProcessor(name, config)
 }
 
@@ -47,7 +47,7 @@ type processorConstructor struct {
 	// newConfig returns a pointer to a zero value config.
 	newConfig func() reflect.Value
 
-	newProc func(config reflect.Value) (procPtr interface{}, err error)
+	newProc func(config reflect.Value) (processor.Processor, error)
 }
 
 type Registry struct {
@@ -70,7 +70,7 @@ func (r *Registry) Register(name string, constructorFunc interface{}) error {
 	return nil
 }
 
-func (r *Registry) NewProcessor(name string, config map[string]interface{}) (interface{}, error) {
+func (r *Registry) NewProcessor(name string, config map[string]interface{}) (processor.Processor, error) {
 	pc, found := r.procs[name]
 	if !found {
 		return nil, fmt.Errorf("processor type %q not found", name)
@@ -131,7 +131,7 @@ func validateConfig(i interface{}) (*processorConstructor, error) {
 		newConfig: func() reflect.Value {
 			return reflect.New(configType)
 		},
-		newProc: func(config reflect.Value) (procPtr interface{}, err error) {
+		newProc: func(config reflect.Value) (processor.Processor, error) {
 			if config.Type().Kind() == reflect.Ptr {
 				config = config.Elem()
 			}
@@ -139,7 +139,7 @@ func validateConfig(i interface{}) (*processorConstructor, error) {
 			if !out[1].IsNil() {
 				return nil, out[1].Interface().(error)
 			}
-			return out[0].Interface(), nil
+			return out[0].Interface().(processor.Processor), nil
 		},
 	}
 	v.Call([]reflect.Value{reflect.New(configType).Elem()})

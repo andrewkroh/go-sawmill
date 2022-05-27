@@ -18,6 +18,8 @@
 package set
 
 import (
+	"fmt"
+
 	"github.com/andrewkroh/go-event-pipeline/pkg/event"
 	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
 )
@@ -26,11 +28,23 @@ func (p *Set) Process(evt processor.Event) error {
 	var v *event.Value
 	if p.config.Value != nil {
 		// TODO: Make creating a value easier.
+		// Implement Unpack for event.Value so that p.config.Value is of type
+		// event.Value.
 		switch x := p.config.Value.(type) {
 		case string:
 			v = event.String(x)
+		case []interface{}:
+			v = event.Array()
+			for _, itm := range x {
+				switch x := itm.(type) {
+				case string:
+					v.Array = append(v.Array, event.String(x))
+				default:
+					panic(fmt.Errorf("unhandled type: %T (%#v)", x, x))
+				}
+			}
 		default:
-			panic("unhandled type")
+			panic(fmt.Errorf("unhandled type: %T (%#v)", x, x))
 		}
 	} else if p.config.CopyFrom != "" {
 		v = evt.Get(p.config.CopyFrom)

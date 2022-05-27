@@ -20,6 +20,7 @@ processors:
       target_field: user.roles
       on_failure:
         - set:
+            # This will fail because user.id exists as a scalar.
             target_field: user.id.roles
             value: FAILED
             on_failure:

@@ -22,8 +22,6 @@ import (
 	"errors"
 )
 
-type ConditionalExpressionConfig string
-
 type Config struct {
 	ID          string            `yaml:"id,omitempty"          json:"id,omitempty"`
 	Description string            `yaml:"description,omitempty" json:"description,omitempty"`
@@ -32,6 +30,15 @@ type Config struct {
 }
 
 type ProcessorConfig map[string]*ProcessorOptionConfig
+
+type ProcessorOptionConfig struct {
+	ID        string                      `yaml:"id,omitempty"         json:"id,omitempty"`
+	If        ConditionalExpressionConfig `yaml:"if,omitempty"         json:"if,omitempty"`
+	OnFailure []ProcessorConfig           `yaml:"on_failure,omitempty" json:"on_failure,omitempty"`
+	Config    map[string]interface{}      `yaml:",inline"              json:"-"                    config:",inline"`
+}
+
+type ConditionalExpressionConfig string
 
 func (c ProcessorConfig) getProcessor() (name string, opts *ProcessorOptionConfig, err error) {
 	if len(c) == 0 {
@@ -49,13 +56,6 @@ func (c ProcessorConfig) getProcessor() (name string, opts *ProcessorOptionConfi
 
 	// Never invoked.
 	return "", nil, errors.New("unexpected number of keys in processor")
-}
-
-type ProcessorOptionConfig struct {
-	ID        string                      `yaml:"id,omitempty"         json:"id,omitempty"`
-	If        ConditionalExpressionConfig `yaml:"if,omitempty"         json:"if,omitempty"`
-	OnFailure []ProcessorConfig           `yaml:"on_failure,omitempty" json:"on_failure,omitempty"`
-	Config    map[string]interface{}      `yaml:",inline"              json:"-"                    config:",inline"`
 }
 
 // UnmarshalJSON contains a workaround for the lack of inline tag support in
