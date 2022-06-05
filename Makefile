@@ -3,7 +3,7 @@ GOLICENSER := go run github.com/elastic/go-licenser@latest
 GORELEASER := go run github.com/goreleaser/goreleaser@latest
 
 .PHONY: all
-all: fmt generate-processors generate-readme test
+all: fmt generate-processors generate-readme test build
 
 .PHONY: generate-readme
 generate-readme:
