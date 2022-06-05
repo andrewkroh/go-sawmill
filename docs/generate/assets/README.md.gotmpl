@@ -44,6 +44,10 @@ on_failure:
 
 ## Processors
 {{ range $processor := .Processors }}
+- [{{$processor.Name}}](#{{$processor.Name}})
+{{- end }}
+
+{{ range $processor := .Processors }}
 {{ template "processor.md.gotmpl" $processor }}
 {{- end }}
 
