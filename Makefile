@@ -1,3 +1,7 @@
+GOFUMPT := go run mvdan.cc/gofumpt@latest
+GOLICENSER := go run github.com/elastic/go-licenser@latest
+GORELEASER := go run github.com/goreleaser/goreleaser@latest
+
 .PHONY: all
 all: fmt generate-processors generate-readme test
 
@@ -13,10 +17,14 @@ generate-processors:
 fmt:
 	go mod tidy
 	@echo go-licenser
-	@go run github.com/elastic/go-licenser@latest
+	@${GOLICENSER}
 	@echo go-fumpt
-	@go run mvdan.cc/gofumpt@latest -w --extra $(shell find . -name '*.go')
+	@${GOFUMPT} -w --extra $(shell find . -name '*.go')
 
 .PHONY: test
 test:
 	go test ./...
+
+.PHONY: build
+build:
+	${GORELEASER} build --snapshot --rm-dist
