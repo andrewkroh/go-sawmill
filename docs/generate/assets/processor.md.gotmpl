@@ -5,5 +5,5 @@
 | Option | Required | Optional | Type | Default | Description |
 |--------|----------|----------|------|---------|-------------|
 {{ range $o := .Configuration -}}
-| {{$o.Name}} | {{bool_to_x $o.Required}} | {{bool_to_x $o.Optional}} | {{$o.Type}} | {{$o.Default}} | {{replace $o.Description "\n" " " }} |
+| {{$o.Name}} | {{bool_to_x $o.Required}} | {{bool_to_x $o.Optional}} | {{$o.Type}} | {{if $o.Default}}{{$o.Default}}{{end}} | {{replace $o.Description "\n" " " }} |
 {{ end }}

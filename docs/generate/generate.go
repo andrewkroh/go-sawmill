@@ -99,6 +99,8 @@ func goTypeToYAMLType(in string) string {
 	switch in {
 	case "github.com/andrewkroh/go-event-pipeline/pkg/config.EventValue":
 		return "any"
+	case "map[string]interface{}":
+		return "map"
 	default:
 		return in
 	}
