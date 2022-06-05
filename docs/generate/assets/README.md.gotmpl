@@ -1,0 +1,49 @@
+# go-sawmill
+
+> **Note**
+> This project is a proof-of-concept and is incomplete.
+
+go-sawmill is an event processing library and command-line application for
+processing text and structured data. The processing steps are defined in YAML as
+a list of discreet processors that manipulate the data.
+
+## Installation
+
+```
+# Go 1.17+
+go install github.com/andrewkroh/go-sawmill/cmd/sawmill@latest
+```
+
+## Usage
+
+```
+cat some-app.log | sawmill -p my-pipeline.yml > output.ndjson
+```
+
+## Pipeline Definition
+
+The pipeline is constructed as YAML. An `id` and one or more `processors` are
+required. The `description` and `on_failure` handler are optional. `on_failure`
+is executed when any processor fails.
+
+```yaml
+---
+id: my-pipeline-identifier
+description: >
+  Summarize the purpose of the pipeline.
+processors:
+  - set:
+      field: label.app
+      value: some-app
+on_failure:
+  - set:
+      target_field: event.kind
+      value: pipeline_error
+      ignore_failure: true
+```
+
+## Processors
+{{ range $processor := .Processors }}
+{{ template "processor.md.gotmpl" $processor }}
+{{- end }}
+

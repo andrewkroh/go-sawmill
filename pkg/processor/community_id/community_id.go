@@ -88,7 +88,8 @@ func (c *Config) InitDefaults() {
 }
 
 // Computes the Community ID for network flow data as defined in the
-// https://github.com/corelight/community-id-spec[Community ID Specification].
+// [Community ID
+// Specification](https://github.com/corelight/community-id-spec).
 // You can use a community ID to correlate network events related to a single
 // flow.
 //
@@ -114,5 +115,6 @@ func (p *CommunityID) String() string {
 }
 
 func (p *CommunityID) Process(event processor.Event) error {
+	// TODO: Implement this in process.go.
 	return nil
 }

@@ -67,5 +67,6 @@ func (p *Remove) String() string {
 }
 
 func (p *Remove) Process(event processor.Event) error {
+	// TODO: Implement this in process.go.
 	return nil
 }

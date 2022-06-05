@@ -1,1 +1,0 @@
-# go-event-pipeline
