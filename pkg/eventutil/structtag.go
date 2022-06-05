@@ -15,24 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package set
+package eventutil
 
-import (
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
-)
+import "strings"
 
-func (p *Set) Process(evt processor.Event) error {
-	var v *event.Value
-	if p.config.Value.Type != event.NullType {
-		v = (*event.Value)(&p.config.Value)
-	} else if p.config.CopyFrom != "" {
-		v = evt.Get(p.config.CopyFrom)
-		if v == nil {
-			return processor.ErrorKeyMissing{Key: p.config.CopyFrom}
+type tagOptions []string
+
+func (t tagOptions) Has(opt string) bool {
+	for _, tagOpt := range t {
+		if tagOpt == opt {
+			return true
 		}
 	}
 
-	_, err := evt.Put(p.config.TargetField, v)
-	return err
+	return false
+}
+
+func parseTag(tag string) (string, tagOptions) {
+	res := strings.Split(tag, ",")
+	return res[0], res[1:]
 }

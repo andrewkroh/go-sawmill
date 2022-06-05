@@ -19,6 +19,7 @@
 package set
 
 import (
+	"github.com/andrewkroh/go-event-pipeline/pkg/config"
 	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
 	"github.com/andrewkroh/go-event-pipeline/pkg/processor/registry"
 )
@@ -48,7 +49,7 @@ type Config struct {
 	TargetField string `config:"target_field"`
 
 	// The value to be set for the field.
-	Value interface{} `config:"value"`
+	Value config.EventValue `config:"value"`
 }
 
 // InitDefaults initializes the configuration options to their default values.

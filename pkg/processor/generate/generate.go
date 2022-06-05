@@ -322,6 +322,9 @@ const typeTmpl = `
 package {{ .Name | to_lower }}
 
 import (
+{{ range $import := config_type_imports .Configuration }}
+	"{{ $import }}"
+{{- end }}
 	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
 	"github.com/andrewkroh/go-event-pipeline/pkg/processor/registry"
 )
@@ -338,7 +341,7 @@ const (
 type Config struct {
 {{- range $field := .Configuration}}
 	// {{ description "\t" $field.Description}}
-	{{$field.Name | to_exported_go_type}} {{$field.Type}} \u0060config:"{{$field.Name}}"{{ if $field.Required }} validate:"required"{{ end }}\u0060
+	{{$field.Name | to_exported_go_type}} {{trim_import $field.Type}} \u0060config:"{{$field.Name}}"{{ if $field.Required }} validate:"required"{{ end }}\u0060
 {{ end -}}
 }
 
@@ -395,6 +398,31 @@ var templateFuncs = template.FuncMap{
 		default:
 			return fmt.Sprintf("%v", in)
 		}
+	},
+	"config_type_imports": func(opts []ConfigurationOption) []string {
+		imports := map[string]struct{}{}
+
+		for _, conf := range opts {
+			idx := strings.LastIndex(conf.Type, ".")
+			if idx == -1 {
+				continue
+			}
+			imports[conf.Type[:idx]] = struct{}{}
+		}
+
+		list := make([]string, 0, len(imports))
+		for k := range imports {
+			list = append(list, k)
+		}
+
+		return list
+	},
+	"trim_import": func(dataType string) string {
+		idx := strings.LastIndex(dataType, "/")
+		if idx == -1 {
+			return dataType
+		}
+		return dataType[idx+1:]
 	},
 }
 

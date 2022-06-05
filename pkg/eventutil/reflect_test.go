@@ -15,23 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mapinterface
+package eventutil
 
-import "strings"
+import (
+	"testing"
 
-type tagOptions []string
+	"github.com/stretchr/testify/require"
+)
 
-func (t tagOptions) Has(opt string) bool {
-	for _, tagOpt := range t {
-		if tagOpt == opt {
-			return true
-		}
-	}
-
-	return false
-}
-
-func parseTag(tag string) (string, tagOptions) {
-	res := strings.Split(tag, ",")
-	return res[0], res[1:]
+func TestReflectValue(t *testing.T) {
+	v, err := ReflectValue([]interface{}{"foo"})
+	require.NoError(t, err)
+	_ = v
 }

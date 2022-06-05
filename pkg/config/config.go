@@ -15,24 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package set
+package config
 
 import (
 	"github.com/andrewkroh/go-event-pipeline/pkg/event"
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
+	"github.com/andrewkroh/go-event-pipeline/pkg/eventutil"
 )
 
-func (p *Set) Process(evt processor.Event) error {
-	var v *event.Value
-	if p.config.Value.Type != event.NullType {
-		v = (*event.Value)(&p.config.Value)
-	} else if p.config.CopyFrom != "" {
-		v = evt.Get(p.config.CopyFrom)
-		if v == nil {
-			return processor.ErrorKeyMissing{Key: p.config.CopyFrom}
-		}
-	}
+type EventValue event.Value
 
-	_, err := evt.Put(p.config.TargetField, v)
-	return err
+func (v *EventValue) Unpack(ifc interface{}) error {
+	value, err := eventutil.ReflectValue(ifc)
+	if err != nil {
+		return err
+	}
+	*v = *(*EventValue)(value)
+	return nil
 }

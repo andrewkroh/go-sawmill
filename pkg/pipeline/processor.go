@@ -120,7 +120,7 @@ func newPipelineProcessor(baseID string, processorIndex int, processorType strin
 
 	proc, err := registry.NewProcessor(processorType, config.Config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed constructing processor with ID %s: %w", id, err)
 	}
 
 	ignoreMissingPtr, ignoreFailurePtr, err := ignores(proc)

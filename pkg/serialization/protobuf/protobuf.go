@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/andrewkroh/go-event-pipeline/pkg/event"
-	"github.com/andrewkroh/go-event-pipeline/pkg/util"
+	"github.com/andrewkroh/go-event-pipeline/pkg/eventutil"
 )
 
 // FromEvent returns a protocol buffer message containing the log
@@ -134,7 +134,7 @@ func ToLogEvent(l *Log) *event.Event {
 
 	evt := event.New()
 	for k, v := range l.Object.Fields {
-		evt.Put(util.EscapeKey(k), toEventValue(v))
+		evt.Put(eventutil.EscapeKey(k), toEventValue(v))
 	}
 	return evt
 }
@@ -158,7 +158,7 @@ func toEventValue(v *Value) *event.Value {
 	case *Value_Object:
 		fields := make(map[string]*event.Value, len(t.Object.Fields))
 		for k, v := range t.Object.Fields {
-			fields[util.EscapeKey(k)] = toEventValue(v)
+			fields[eventutil.EscapeKey(k)] = toEventValue(v)
 		}
 		return event.Object(fields)
 	case *Value_String_:
