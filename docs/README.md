@@ -50,6 +50,7 @@ on_failure:
 - [remove](#remove)
 - [set](#set)
 - [uppercase](#uppercase)
+- [webassembly](#webassembly)
 
 
 ### append
@@ -135,6 +136,17 @@ Uppercase converts a string to its uppercase equivalent. If the field is an arra
 | field | x |  | string |  | Source field to process. |
 | ignore_missing |  | x | bool |  | If true and field does not exist or is null, the processor quietly returns without modifying the document. |
 | target_field |  | x | string |  | The field to assign the output value to, by default field is updated in-place. |
+
+
+### webassembly
+
+Executes a WebAssembly module to process the event.
+
+| Option | Required | Optional | Type | Default | Description |
+|--------|----------|----------|------|---------|-------------|
+| file | x |  | string |  | Path to the WebAssembly module to load. Binary (`.wasm`) and text (`.wat`) formats are supported.  |
+| ignore_failure |  | x | bool |  | Ignore failures for the processor. |
+| params |  | x | map |  | A dictionary of parameters that are passed to module's `register` function.  |
 
 
 

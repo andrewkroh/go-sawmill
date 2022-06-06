@@ -1,0 +1,14 @@
+---
+
+id: demo
+description: Demo pipeline
+processors:
+  - set:
+      target_field: event.category
+      value: [authentication]
+  - webassembly:
+      file: ../../pkg/processor/webassembly/testdata/demo.wasm.gz
+  - lowercase:
+      field: message
+      ignore_missing: true
+

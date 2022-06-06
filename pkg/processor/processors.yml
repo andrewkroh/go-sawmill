@@ -155,4 +155,20 @@ processors:
         - <<: *target_field
         - <<: *ignore_missing
         - <<: *ignore_failure
-
+  - webassembly:
+      description: |-
+        Executes a WebAssembly module to process the event.
+      configuration:
+        - name: file
+          type: string
+          required: true
+          description: >
+            Path to the WebAssembly module to load. Binary (`.wasm`) and text
+            (`.wat`) formats are supported.
+        - name: params
+          type: 'map[string]interface{}'
+          optional: true
+          description: >
+            A dictionary of parameters that are passed to module's `register`
+            function.
+        - <<: *ignore_failure

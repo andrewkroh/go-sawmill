@@ -9,6 +9,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/stretchr/testify v1.7.0
+	github.com/tetratelabs/wazero v0.0.0-20220605115001-fd3834442b7e
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )
 

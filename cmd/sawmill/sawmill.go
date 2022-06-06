@@ -42,6 +42,7 @@ import (
 	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/remove"
 	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/set"
 	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/uppercase"
+	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/webassembly"
 )
 
 var (
