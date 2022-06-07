@@ -5,7 +5,7 @@
 
 go-sawmill is an event processing library and command-line application for
 processing text and structured data. The processing steps are defined in YAML as
-a list of discreet processors that manipulate the data.
+a list of discrete processors that manipulate the data.
 
 ## Installation
 
