@@ -291,3 +291,22 @@ func TestPathString(t *testing.T) {
 	assert.Equal(t, "/event/ingested", pathString([]string{"event", "ingested"}))
 	assert.Equal(t, "/ecs.version", pathString([]string{"ecs.version"}))
 }
+
+func BenchmarkEvent(b *testing.B) {
+	numberField := Integer(1)
+	event := New()
+	event.Put("foo.bar", numberField)
+	path := keyToPath("foo.bar")
+
+	b.Run("field_put_overwrite", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			event.put(path, numberField, true)
+		}
+	})
+
+	b.Run("field_get", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			event.get(path)
+		}
+	})
+}

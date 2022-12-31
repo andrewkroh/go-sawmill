@@ -153,8 +153,8 @@ func (e *Event) UnmarshalJSON(data []byte) error {
 // keyToPath creates an object path from a dot-separated key. If a path name
 // contains a dot then the dot must be escaped by a backslash.
 //
-//    foo.bar = [foo, bar]
-//    foo\.bar = [foo.bar]
+//	foo.bar = [foo, bar]
+//	foo\.bar = [foo.bar]
 func keyToPath(key string) []string {
 	var paths []string
 	var pathScratch []byte

@@ -48,8 +48,10 @@ var templates = template.Must(template.New("").
 	ParseFS(templatesFS, "assets/*.gotmpl"))
 
 // Flags
-var processorsYmlFile string
-var outputFile string
+var (
+	processorsYmlFile string
+	outputFile        string
+)
 
 func init() {
 	flag.StringVar(&processorsYmlFile, "p", "processors.yml", "processors.yml file to use as the source")

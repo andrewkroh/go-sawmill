@@ -56,10 +56,10 @@ func New(config *Config) (*Pipeline, error) {
 // Process transforms an event by processing it through the pipeline. There
 // are four cases that callers should expect for return values.
 //
-//   Event pass through - The input event is returned as index 0 of the slice.
-//   Dropped event - Empty slice and nil error.
-//   Processing error - Empty slice and non-nil error.
-//   Event split - Slice length is greater than 1 and non-nil error.
+//	Event pass through - The input event is returned as index 0 of the slice.
+//	Dropped event - Empty slice and nil error.
+//	Processing error - Empty slice and non-nil error.
+//	Event split - Slice length is greater than 1 and non-nil error.
 func (pipe *Pipeline) Process(evt *event.Event) (*event.Event, error) {
 	pipeEvt := &pipelineEvent{data: evt}
 

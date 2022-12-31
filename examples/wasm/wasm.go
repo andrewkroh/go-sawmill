@@ -59,7 +59,7 @@ func process(this js.Value, args []js.Value) interface{} {
 		return "failed to process event: " + err.Error()
 	}
 
-	return toObject(out[0])
+	return toObject(out)
 }
 
 // toObject converts a struct to a map[string]interface{} using JSON
