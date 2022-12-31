@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
+	"github.com/andrewkroh/go-sawmill/pkg/event"
 )
 
 type Event interface {

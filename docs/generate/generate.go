@@ -27,7 +27,7 @@ import (
 	"sort"
 	"text/template"
 
-	"github.com/andrewkroh/go-event-pipeline/internal/proctemplate"
+	"github.com/andrewkroh/go-sawmill/internal/proctemplate"
 )
 
 //go:embed assets/*.gotmpl
@@ -99,7 +99,7 @@ func main() {
 
 func goTypeToYAMLType(in string) string {
 	switch in {
-	case "github.com/andrewkroh/go-event-pipeline/pkg/config.EventValue":
+	case "github.com/andrewkroh/go-sawmill/pkg/config.EventValue":
 		return "any"
 	case "map[string]interface{}":
 		return "map"

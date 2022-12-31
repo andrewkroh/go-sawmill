@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor/lowercase"
+	"github.com/andrewkroh/go-sawmill/pkg/processor/lowercase"
 )
 
 func TestIgnore(t *testing.T) {

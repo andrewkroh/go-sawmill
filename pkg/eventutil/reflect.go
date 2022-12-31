@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
+	"github.com/andrewkroh/go-sawmill/pkg/event"
 )
 
 const tagName = "event"

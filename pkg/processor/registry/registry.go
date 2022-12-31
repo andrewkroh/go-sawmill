@@ -23,7 +23,7 @@ import (
 
 	"github.com/elastic/go-ucfg"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
+	"github.com/andrewkroh/go-sawmill/pkg/processor"
 )
 
 var (

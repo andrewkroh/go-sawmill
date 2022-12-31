@@ -1,4 +1,4 @@
-module github.com/andrewkroh/go-event-pipeline
+module github.com/andrewkroh/go-sawmill
 
 go 1.17
 

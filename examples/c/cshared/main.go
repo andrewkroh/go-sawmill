@@ -23,11 +23,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
-	"github.com/andrewkroh/go-event-pipeline/pkg/pipeline"
+	"github.com/andrewkroh/go-sawmill/pkg/event"
+	"github.com/andrewkroh/go-sawmill/pkg/pipeline"
 
 	// Register
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/lowercase"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/lowercase"
 )
 
 var pipe *pipeline.Pipeline

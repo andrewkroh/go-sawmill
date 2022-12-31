@@ -33,14 +33,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor/registry"
+	"github.com/andrewkroh/go-sawmill/pkg/event"
+	"github.com/andrewkroh/go-sawmill/pkg/processor"
+	"github.com/andrewkroh/go-sawmill/pkg/processor/registry"
 
 	// Register processors for testing purposes.
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/append"
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/lowercase"
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/set"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/append"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/lowercase"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/set"
 )
 
 var generateExpected = flag.Bool("g", false, "generate expected output")

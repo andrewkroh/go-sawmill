@@ -20,8 +20,8 @@ package mapinterface
 import (
 	"fmt"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
-	"github.com/andrewkroh/go-event-pipeline/pkg/eventutil"
+	"github.com/andrewkroh/go-sawmill/pkg/event"
+	"github.com/andrewkroh/go-sawmill/pkg/eventutil"
 )
 
 // ToEvent converts a map[string]interface{} to an Event.

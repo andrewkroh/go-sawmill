@@ -18,8 +18,8 @@
 package config
 
 import (
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
-	"github.com/andrewkroh/go-event-pipeline/pkg/eventutil"
+	"github.com/andrewkroh/go-sawmill/pkg/event"
+	"github.com/andrewkroh/go-sawmill/pkg/eventutil"
 )
 
 type EventValue event.Value
