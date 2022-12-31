@@ -20,7 +20,7 @@ package eventutil
 import (
 	"strings"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
+	"github.com/andrewkroh/go-sawmill/pkg/event"
 )
 
 // Append appends a value to an existing array. If a non-array value

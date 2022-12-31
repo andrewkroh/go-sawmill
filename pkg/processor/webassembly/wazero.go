@@ -30,8 +30,8 @@ import (
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/sys"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/eventutil"
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
+	"github.com/andrewkroh/go-sawmill/pkg/eventutil"
+	"github.com/andrewkroh/go-sawmill/pkg/processor"
 )
 
 var timeNow = time.Now

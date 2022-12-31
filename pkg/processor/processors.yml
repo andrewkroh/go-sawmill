@@ -145,7 +145,7 @@ processors:
         already exists, its value will be replaced with the provided one.
       configuration:
         - name: value
-          type: 'github.com/andrewkroh/go-event-pipeline/pkg/config.EventValue'
+          type: 'github.com/andrewkroh/go-sawmill/pkg/config.EventValue'
           optional: true
           description: The value to be set for the field.
         - name: copy_from

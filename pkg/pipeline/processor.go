@@ -25,8 +25,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor/registry"
+	"github.com/andrewkroh/go-sawmill/pkg/processor"
+	"github.com/andrewkroh/go-sawmill/pkg/processor/registry"
 )
 
 type pipelineProcessor struct {

@@ -19,9 +19,9 @@
 package set
 
 import (
-	"github.com/andrewkroh/go-event-pipeline/pkg/config"
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor/registry"
+	"github.com/andrewkroh/go-sawmill/pkg/config"
+	"github.com/andrewkroh/go-sawmill/pkg/processor"
+	"github.com/andrewkroh/go-sawmill/pkg/processor/registry"
 )
 
 func init() {

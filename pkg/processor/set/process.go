@@ -18,8 +18,8 @@
 package set
 
 import (
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
+	"github.com/andrewkroh/go-sawmill/pkg/event"
+	"github.com/andrewkroh/go-sawmill/pkg/processor"
 )
 
 func (p *Set) Process(evt processor.Event) error {

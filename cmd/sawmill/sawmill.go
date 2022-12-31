@@ -31,18 +31,18 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/event"
-	"github.com/andrewkroh/go-event-pipeline/pkg/metrics"
-	"github.com/andrewkroh/go-event-pipeline/pkg/pipeline"
+	"github.com/andrewkroh/go-sawmill/pkg/event"
+	"github.com/andrewkroh/go-sawmill/pkg/metrics"
+	"github.com/andrewkroh/go-sawmill/pkg/pipeline"
 
 	// Register processors:
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/append"
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/community_id"
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/lowercase"
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/remove"
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/set"
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/uppercase"
-	_ "github.com/andrewkroh/go-event-pipeline/pkg/processor/webassembly"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/append"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/community_id"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/lowercase"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/remove"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/set"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/uppercase"
+	_ "github.com/andrewkroh/go-sawmill/pkg/processor/webassembly"
 )
 
 var (

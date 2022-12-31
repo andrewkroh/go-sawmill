@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/andrewkroh/go-event-pipeline/pkg/processor"
+	"github.com/andrewkroh/go-sawmill/pkg/processor"
 )
 
 var _ processor.Processor = (*DummyProc)(nil)

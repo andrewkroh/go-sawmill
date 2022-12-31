@@ -32,7 +32,7 @@ import (
 	"sort"
 	"text/template"
 
-	"github.com/andrewkroh/go-event-pipeline/internal/proctemplate"
+	"github.com/andrewkroh/go-sawmill/internal/proctemplate"
 )
 
 var (
