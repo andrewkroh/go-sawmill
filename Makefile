@@ -3,7 +3,7 @@ GOLICENSER := go run github.com/elastic/go-licenser@latest
 GORELEASER := go run github.com/goreleaser/goreleaser@latest
 
 .PHONY: all
-all: fmt generate test build
+all: fmt generate test build examples
 
 .PHONY: generate
 generate: generate-processors generate-readme
@@ -31,3 +31,9 @@ test:
 .PHONY: build
 build:
 	${GORELEASER} build --snapshot --rm-dist
+
+.PHONY: examples
+examples:
+	$(MAKE) -C examples/c
+	$(MAKE) -C examples/wasm build
+
